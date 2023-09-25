@@ -6,8 +6,7 @@ import uct.cs.networks.enums.Enums;
  *
  * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
  */
-public interface IMessageHeader {
-    
+public interface IMessageHeader {    
     public String getId();
     public String getTimestamp();
     public Enums.MessageType getType();     

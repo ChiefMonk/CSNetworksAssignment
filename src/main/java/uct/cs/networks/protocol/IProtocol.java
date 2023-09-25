@@ -6,7 +6,7 @@ import uct.cs.networks.interfaces.*;
  * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
  */
 public interface IProtocol {  
+    String getSource();
     String getDestination();
-    public IMessageHeader getHeader();
-    public IMessageBody getBody();   
+    public IMessage getMessage();   
 }

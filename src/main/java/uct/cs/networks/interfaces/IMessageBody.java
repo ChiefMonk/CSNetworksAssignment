@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
 package uct.cs.networks.interfaces;
 
 /**
@@ -10,4 +6,11 @@ package uct.cs.networks.interfaces;
  */
 public interface IMessageBody {
     
+    public Object getData();
+    
+    public void setData(Object data);
+    
+    public String getInfo();
+    
+    public void setInfo(String info);
 }

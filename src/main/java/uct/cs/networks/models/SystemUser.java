@@ -6,9 +6,8 @@ package uct.cs.networks.models;
  */
 public class SystemUser {    
     private final String _id;
-    private final String _name;
-    private String _ipAddress;
-    private int _portNumber;
+    private final String _name;  
+    private String _secretKey;
     private String _publicKey;
     
     public SystemUser(String name) {
@@ -23,13 +22,9 @@ public class SystemUser {
     public String getName() {
         return _name;
     }
-    
-    public String getIpAddress() {
-        return _ipAddress;
-    }
-     
-    public int getPortNumber() {
-        return _portNumber;
+       
+    public String getSecretKey() {
+        return _secretKey;
     }
     
     public String getPublicKey() {
