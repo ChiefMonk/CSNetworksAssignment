@@ -9,8 +9,7 @@ import uct.cs.networks.enums.Enums;
 public interface IMessageHeader {    
     public String getId();
     public String getTimestamp();
-    public Enums.MessageType getType();     
-    public Enums.MessageFormat getFormat();    
+    public Enums.MessageType getType();   
     public String getSenderId();
     public String getReceiverId();
 }

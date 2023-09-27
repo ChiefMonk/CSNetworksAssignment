@@ -5,19 +5,15 @@ package uct.cs.networks.enums;
  * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
  */
 
-public class Enums {
-    public static enum MessageDestination {
-        Client,
-        Server       
-    }
-    
-    public static enum MessageType {
-        ClientHandshake,
-        ServerHandshake,
+public class Enums 
+{    
+    public static enum MessageType {       
         ValidateCertificate,
-        SessionStart,
+        SessionStart,      
+        SendImageMessage,
+        SendTextMessage,
         SessionEnd,
-        SendMessage,
+        ServerBroadcastUserList,       
     }
 
     public static enum MessageFormat {

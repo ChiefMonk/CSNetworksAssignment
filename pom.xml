@@ -5,7 +5,59 @@
     <artifactId>Peer2PeerSecureComms</artifactId>
     <version>1.0.1</version>
     <packaging>jar</packaging>
-    <dependencies>        
+     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
+        <exec.mainClass>uct.cs.networks.ui.ChatClientGUI</exec.mainClass>
+    </properties>
+    
+    <build>
+        <plugins>           
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                          <addClasspath>true</addClasspath>
+                           <classpathPrefix>lib/</classpathPrefix>
+                          <mainClass>>uct.cs.networks.ui.ChatClientGUI</mainClass>
+                        </manifest>
+                      </archive>
+                       <archive>
+                        <manifest>
+                          <addClasspath>true</addClasspath>
+                           <classpathPrefix>lib/</classpathPrefix>
+                          <mainClass>>uct.cs.networks.ui.ChatServer</mainClass>
+                        </manifest>
+                      </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+            </plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>  
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.1.1</version>
+         </dependency>      
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-jdk15on</artifactId>
@@ -13,10 +65,5 @@
             <type>jar</type>
         </dependency>
     </dependencies>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>20</maven.compiler.source>
-        <maven.compiler.target>20</maven.compiler.target>
-        <exec.mainClass>uct.cs.networks.Peer2PeerSecureComms</exec.mainClass>
-    </properties>
+   
 </project>

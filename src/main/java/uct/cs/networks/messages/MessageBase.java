@@ -6,16 +6,19 @@ import uct.cs.networks.interfaces.IMessageHeader;
 
 /**
  *
- * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
+ * @author Shaylin Chetty (CHTSHA042@myuct.ac.za)
+ * @author Chipo Hamayobe (HMYCHI001@myuct.ac.za)
+ * @author Orefile Morule (MRLORE001@myuct.ac.za)
+ * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
 public abstract class MessageBase {
       
     private IMessageHeader _header;
     private IMessageBody _body;
     
-    public MessageBase(Enums.MessageType type, Enums.MessageFormat format, String senderId, String receiverId)
+    public MessageBase(Enums.MessageType type, String senderId, String receiverId)
     {
-        _header = new MessageHeader(type, format, senderId, receiverId);
+        _header = new MessageHeader(type, senderId, receiverId);
     }
     
     public IMessageHeader getHeader() {

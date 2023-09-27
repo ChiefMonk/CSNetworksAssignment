@@ -1,7 +1,7 @@
 package uct.cs.networks.messages;
 
 import uct.cs.networks.enums.Enums;
-import uct.cs.networks.interfaces.*;
+import uct.cs.networks.interfaces.IMessage;
 
 /**
  *
@@ -10,10 +10,10 @@ import uct.cs.networks.interfaces.*;
  * @author Orefile Morule (MRLORE001@myuct.ac.za)
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
-public class SessionStartMessage extends MessageBase implements IMessage {
-
-    public SessionStartMessage(String senderId, String receiverId)
-    {
-        super(Enums.MessageType.SessionStart, senderId, receiverId);
+public class ValidateCertificateMessage extends MessageBase implements IMessage {
+    
+    public ValidateCertificateMessage(String senderId, String receiverId) {
+        super(Enums.MessageType.ValidateCertificate, senderId, receiverId);
     }
+    
 }
