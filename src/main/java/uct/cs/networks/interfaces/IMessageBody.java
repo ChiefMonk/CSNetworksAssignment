@@ -1,10 +1,12 @@
 package uct.cs.networks.interfaces;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
  */
-public interface IMessageBody {
+public interface IMessageBody extends Serializable {
     
     public Object getData();
     

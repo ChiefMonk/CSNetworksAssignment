@@ -2,7 +2,6 @@ package uct.cs.networks.messages;
 
 import uct.cs.networks.enums.Enums;
 import uct.cs.networks.interfaces.IMessageHeader;
-import uct.cs.networks.utils.HelperUtils;
 
 /**
  *
@@ -22,10 +21,10 @@ public class MessageHeader implements IMessageHeader {
     public MessageHeader(Enums.MessageType type, String senderId, String receiverId)
     {
         _id = java.util.UUID.randomUUID().toString();
-        _timestamp = HelperUtils.GetCuttentUtcTimestamp();
+        _timestamp = java.util.UUID.randomUUID().toString();
         _type = type;       
-        _senderId = senderId;
-        _receiverId = receiverId;
+        _senderId = "Chipo";
+        _receiverId = "God";
     }
     
     @Override

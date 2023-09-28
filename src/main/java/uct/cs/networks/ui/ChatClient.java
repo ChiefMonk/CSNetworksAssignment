@@ -1,126 +1,67 @@
 package uct.cs.networks.ui;
 
-import com.formdev.flatlaf.FlatLightLaf;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Logger;
+    import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
 /**
  *
  * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
  */
-public class ChatClient extends javax.swing.JFrame {   
-    private JList<String> userList;
-    private JTextArea chatArea;
-    private JTextField messageField;
-    private JButton sendButton;
+
+public class ChatClient {
+    private static final String SERVER_ADDRESS = "localhost";
+    private static final int SERVER_PORT = 4026;
+    private Socket socket;
+    private BufferedReader input;
+    private PrintWriter output;
 
     public ChatClient() {
-        
-       // initComponents();
-        this.setResizable(true);
-          
-           this.setDefaultCloseOperation(javax.swing.JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new java.awt.event.WindowAdapter() {
-        @Override
-        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-            ButtonExitApplicationActionPerformed(null);
-        }}); 
-        
-        // Create the main frame
-       // frame = new JFrame("Chat Client");
-        //ame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
+        try {
+            socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            output = new PrintWriter(socket.getOutputStream(), true);
 
-        // Create a panel for the user list
-        userList = new JList<>();
-        JScrollPane userListScrollPane = new JScrollPane(userList);
-        userListScrollPane.setPreferredSize(new Dimension(100, 0));
+            // Create a thread for receiving messages from the server
+            Thread serverListener = new Thread(new ServerListener());
+            serverListener.start();
 
-        // Create a panel for the chat area
-        chatArea = new JTextArea();
-        chatArea.setEditable(false);
-        JScrollPane chatScrollPane = new JScrollPane(chatArea);
-
-        // Create a panel for the message input and send button
-        JPanel inputPanel = new JPanel(new BorderLayout());
-        messageField = new JTextField();
-        sendButton = new JButton("Send");
-        inputPanel.add(messageField, BorderLayout.CENTER);
-        inputPanel.add(sendButton, BorderLayout.EAST);
-
-        // Add action listener to the send button
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String message = messageField.getText();
-                if (!message.isEmpty()) {
-                    // Replace this with your code to send the message
-                    chatArea.append("You: " + message + "\n");
-                    messageField.setText("");
-                }
+            // Read input from the console and send it to the server
+            BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
+            String userInput;
+            while ((userInput = consoleInput.readLine()) != null) {
+                output.println(userInput);
             }
-        });
-
-        // Create a panel to hold the user list and chat area
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add(userListScrollPane, BorderLayout.WEST);
-        mainPanel.add(chatScrollPane, BorderLayout.CENTER);
-
-        // Add panels to the main frame
-        add(mainPanel, BorderLayout.CENTER);
-        add(inputPanel, BorderLayout.SOUTH);
-
-        // Display the frame
-        setVisible(true);
-    }
-    
-    private void ButtonExitApplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonExitApplicationActionPerformed
-        int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application", "Exit the Application", JOptionPane.YES_NO_OPTION);
-        if (reply == JOptionPane.YES_OPTION) {
-             System.exit(0);
-        }    
-    }
-
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        boolean isLookSet = false;
-        
-        try {            
-            FlatLightLaf.setup();
-            javax.swing.UIManager.setLookAndFeel( new FlatLightLaf() );
-            isLookSet = true;
-            
-         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-           
-       if(!isLookSet) {
-            try {           
-                for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                        break;
-                    }
-                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-                }
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-                Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
-       }
-        //</editor-fold>
+    }
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ChatClient().setVisible(true);
+    private class ServerListener implements Runnable {
+        @Override
+        public void run() {
+            try {
+                String serverMessage;
+                while ((serverMessage = input.readLine()) != null) {
+                    System.out.println("Server: " + serverMessage);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
+        }
+    }
+
+    public static void main(String[] args) {
+       
+       
+        ChatClient client = new ChatClient();
     }
 }
-

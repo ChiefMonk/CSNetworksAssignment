@@ -14,6 +14,5 @@ public class SendImageMessage extends MessageBase implements IMessage {
     
     public SendImageMessage(String senderId, String receiverId) {
         super(Enums.MessageType.SendImageMessage, senderId, receiverId);
-    }
-    
+    }    
 }

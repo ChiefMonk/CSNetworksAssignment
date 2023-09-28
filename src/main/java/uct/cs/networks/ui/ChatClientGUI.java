@@ -6,6 +6,9 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Image;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.*;
@@ -13,6 +16,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import uct.cs.networks.interfaces.IMessage;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.io.*;
+import java.net.Socket;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import uct.cs.networks.enums.Enums;
+import uct.cs.networks.utils.MessageFactory;
 
 /** 
  * The ChatClientGUI is the main class for the Desktop Application.
@@ -31,11 +40,15 @@ public class ChatClientGUI extends javax.swing.JFrame {
     private static final String ERROR_DEFAULT_TITLE = "Invalid Error Occurred";
     private static final int SCROLL_BUFFER_SIZE = 10;     
     private final JFileChooser _fileChooser;
-    private String _ipAddress;
-    private int _portNumber;
+    private String _ipAddress = "127.0.0.1";
+    private int _portNumber = 4026;
     
     private List<IMessage> _messageSendList;
     private List<IMessage> _messageReceivedList;
+    
+   private ObjectOutputStream _outputStream; 
+   private ObjectInputStream _inputStream;
+   private SSLSocket _secureSocket;
        
     
     /**
@@ -58,7 +71,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
         buttonGroup.add(RadioButtonUser1);
         buttonGroup.add(RadioButtonUser2);
         buttonGroup.add(RadioButtonUser3);
-         buttonGroup.add(RadioButtonUser4);
+        buttonGroup.add(RadioButtonUser4);
         buttonGroup.add(RadioButtonUser5);
         buttonGroup.add(RadioButtonUser6);
         
@@ -93,10 +106,10 @@ public class ChatClientGUI extends javax.swing.JFrame {
         RadioButtonUser5 = new javax.swing.JRadioButton();
         RadioButtonUser6 = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        textAreaInputKB = new javax.swing.JTextArea();
+        textAreaOutput = new javax.swing.JTextArea();
         ButtonVerifyQuery2 = new javax.swing.JButton();
         PanelOutputEntailAndJustify = new javax.swing.JPanel();
-        textFieldInputQuery = new javax.swing.JTextField();
+        textFieldInputMessage = new javax.swing.JTextField();
         ButtonVerifyQuery1 = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox<>();
         PanelOutputExplanations = new javax.swing.JPanel();
@@ -142,11 +155,11 @@ public class ChatClientGUI extends javax.swing.JFrame {
 
         RadioButtonUser6.setText("User6");
 
-        textAreaInputKB.setEditable(false);
-        textAreaInputKB.setColumns(20);
-        textAreaInputKB.setRows(1000);
-        textAreaInputKB.setFocusable(false);
-        jScrollPane1.setViewportView(textAreaInputKB);
+        textAreaOutput.setEditable(false);
+        textAreaOutput.setColumns(20);
+        textAreaOutput.setRows(1000);
+        textAreaOutput.setFocusable(false);
+        jScrollPane1.setViewportView(textAreaOutput);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -224,7 +237,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
 
         PanelOutputEntailAndJustify.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
 
-        textFieldInputQuery.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        textFieldInputMessage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
         ButtonVerifyQuery1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         ButtonVerifyQuery1.setText("Send Message");
@@ -249,7 +262,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(textFieldInputQuery)
+                .addComponent(textFieldInputMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ButtonVerifyQuery1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -264,7 +277,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(ButtonVerifyQuery1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(textFieldInputQuery, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
+                    .addComponent(textFieldInputMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
 
@@ -359,7 +372,26 @@ public class ChatClientGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ButtonVerifyQuery1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonVerifyQuery1ActionPerformed
-        // TODO add your handling code here:
+        
+        String info = textFieldInputMessage.getText();
+        
+        if(info == null || info.isBlank())
+            return;
+        
+        if(_outputStream == null)
+            startListener();
+        
+        try
+        {   
+            IMessage message = MessageFactory.CreateMessage(Enums.MessageType.SendTextMessage, info);
+
+            _outputStream.writeObject(message);                   
+            _outputStream.flush();           
+        }
+         catch (IOException ex) {
+            ex.printStackTrace();
+         }
+         textFieldInputMessage.setText("");        // TODO add your handling code here:
     }//GEN-LAST:event_ButtonVerifyQuery1ActionPerformed
 
     private void ButtonVerifyQuery2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonVerifyQuery2ActionPerformed
@@ -383,7 +415,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         
-        String ipAddress = JOptionPane.showInputDialog(this, "Enter Server IP Address: ", "Server Settings", 2);
+        String ipAddress = JOptionPane.showInputDialog(this, "Enter Server IP Address: ", "Server Settings", JOptionPane.OK_CANCEL_OPTION);
               
         // Regular expression patterns for IPv4
         String ipv4Pattern = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
@@ -403,26 +435,26 @@ public class ChatClientGUI extends javax.swing.JFrame {
             
         _ipAddress = ipAddress;
                
-        String portNumber =  JOptionPane.showInputDialog(this, "Enter Server Port Number: ", "Server Settings", 2);
+        String portNumber = JOptionPane.showInputDialog(this, "Enter Server Port Number: ", "Server Settings", JOptionPane.OK_CANCEL_OPTION);
         
         try {
             // Parse the port number as an integer
             int port = Integer.parseInt(portNumber);
 
             // Check if the port number is within the valid range (1 - 65535)
-            if(port >= 5000 && port <= 65535)
+            if(port >= 4000 && port <= 65535)
             {
                  _portNumber =  port;
             }
             else
             {
-                showErrorPopupMessage("Invalid Port Number", "Please enter a valid Server Port Number between 5000 and 65535");
+                showErrorPopupMessage("Invalid Port Number", "Please enter a valid Server Port Number between 4000 and 65535");
                 return;
             }
         } 
         catch (NumberFormatException ex) {
             // If a NumberFormatException is thrown, the port number is not a valid integer
-            showErrorPopupMessage("Invalid Port Number", "Please enter a valid Server Port Number between 5000 and 65535", ex);
+            showErrorPopupMessage("Invalid Port Number", "Please enter a valid Server Port Number between 4000 and 65535", ex);
             return;
         }
 
@@ -430,14 +462,27 @@ public class ChatClientGUI extends javax.swing.JFrame {
         if (ipAddress != null && portNumber != null) 
         {       
             JOptionPane.showMessageDialog(null, "Server IP Address: " + ipAddress + "\nServer Port Number: " + portNumber);
+             startListener();
         } // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
-    private void ButtonExitApplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonExitApplicationActionPerformed
+    private void ButtonExitApplicationActionPerformed(java.awt.event.ActionEvent evt) {                                                      
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application", "Exit the Application", JOptionPane.YES_NO_OPTION);
         if (reply == JOptionPane.YES_OPTION) {
              System.exit(0);
         }    
+    }
+    private void processReceivedMessage(String message)
+    {
+        textAreaOutput.append(String.format("%s\n", message));
+    }
+    
+    private void processReceivedMessage(IMessage message)
+    {
+        if(message == null)
+            return;
+        
+        textAreaOutput.append(String.format("%s\n", message.getBody().getInfo()));
     }
      // </editor-fold>
     
@@ -476,6 +521,45 @@ public class ChatClientGUI extends javax.swing.JFrame {
      
     
     // </editor-fold>
+       
+     private void startListener() 
+     {      
+        try {
+            // Connect to the server
+            SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+            _secureSocket = (SSLSocket) factory.createSocket(_ipAddress, _portNumber);
+
+            // Create reader and writer            
+             _outputStream = new ObjectOutputStream(_secureSocket.getOutputStream());
+            _inputStream = new ObjectInputStream(_secureSocket.getInputStream());
+           
+            // _printWriter = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+
+            // Start a new thread for receiving messages
+           Thread receiveThread = new Thread(() -> {
+               try {
+                   Object  object;
+                   while ((object = _inputStream.readObject()) != null)                 
+                   {
+                      IMessage message = MessageFactory.getMessage(object);
+                      processReceivedMessage(message);
+                   }
+               } 
+               catch (IOException e) 
+               {
+                   e.printStackTrace();
+               } 
+               catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ChatClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+            receiveThread.start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+     
     
     /**
      * @param args the command line arguments
@@ -545,8 +629,8 @@ public class ChatClientGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane7;
-    private javax.swing.JTextArea textAreaInputKB;
+    private javax.swing.JTextArea textAreaOutput;
     private javax.swing.JTextArea textAreaOutputExplanation;
-    private javax.swing.JTextField textFieldInputQuery;
+    private javax.swing.JTextField textFieldInputMessage;
     // End of variables declaration//GEN-END:variables
 }

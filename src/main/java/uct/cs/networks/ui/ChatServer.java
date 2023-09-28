@@ -9,18 +9,28 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import uct.cs.networks.interfaces.IMessage;
+import uct.cs.networks.utils.MessageFactory;
 
 public class ChatServer 
 {
     private static final int PORT = 4026;
-    private static Set<PrintWriter> clientWriters = new HashSet<>();
+    private static Set<ObjectOutputStream> clientWriters = new HashSet<>();
     private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) 
-    {
-        System.out.println(String.format("The Chat Server is running on port %s ...", PORT));
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) 
-        {
+    {              
+        try
+        {                                     
+            SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            SSLServerSocket serverSocket = (SSLServerSocket) factory.createServerSocket(PORT);
+                    
+            System.out.println(String.format("The Secure Chat Server is running on port %s ...", PORT));
+            
             while (true) 
             {
                 Socket clientSocket = serverSocket.accept();
@@ -34,28 +44,31 @@ public class ChatServer
     }
 
     private static class ClientHandler implements Runnable 
-    {
-        private Socket socket;
-        private PrintWriter out;
+    {       
+        private final Socket _secureSocket;
+        private ObjectOutputStream outputStream;
 
-        public ClientHandler(Socket socket) 
+        public ClientHandler(Socket secureSocket) 
         {
-            this.socket = socket;
+            _secureSocket = secureSocket;                       
         }
 
+        @Override
         public void run() 
         {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new PrintWriter(socket.getOutputStream(), true);
+              
+                ObjectInputStream inputStream = new ObjectInputStream(_secureSocket.getInputStream());       
+                outputStream = new ObjectOutputStream (_secureSocket.getOutputStream());
 
                 synchronized (clientWriters) 
                 {
-                    clientWriters.add(out);
+                    clientWriters.add(outputStream);
                 }
-
-                String message;
-                while ((message = in.readLine()) != null) {
+                  
+               Object object;
+                while ((object = inputStream.readObject()) != null) {
+                    IMessage message = MessageFactory.getMessage(object);
                     System.out.println("Received: " + message);
                     broadcastMessage(message);
                 }
@@ -64,11 +77,14 @@ public class ChatServer
             {
                 e.printStackTrace();
             } 
+            catch (ClassNotFoundException ex) {
+                Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, ex);
+            } 
             finally 
             {
                 try 
                 {
-                    socket.close();
+                    _secureSocket.close();
                 } 
                 catch (IOException e) 
                 {
@@ -76,18 +92,18 @@ public class ChatServer
                 }
                 synchronized (clientWriters) 
                 {
-                    clientWriters.remove(out);
+                    clientWriters.remove(outputStream);
                 }
             }
         }
 
-        private void broadcastMessage(String message) 
+        private void broadcastMessage( IMessage message) throws IOException 
         {
             synchronized (clientWriters) 
             {
-                for (PrintWriter writer : clientWriters) 
+                for (ObjectOutputStream writer : clientWriters) 
                 {
-                    writer.println(message);
+                    writer.writeObject(message);
                 }
             }
         }

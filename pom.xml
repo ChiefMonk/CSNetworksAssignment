@@ -26,6 +26,14 @@
                           <mainClass>>uct.cs.networks.ui.ChatClientGUI</mainClass>
                         </manifest>
                       </archive>
+                      
+                       <archive>
+                        <manifest>
+                          <addClasspath>true</addClasspath>
+                           <classpathPrefix>lib/</classpathPrefix>
+                          <mainClass>>uct.cs.networks.ui.ChatClient</mainClass>
+                        </manifest>
+                      </archive>
                        <archive>
                         <manifest>
                           <addClasspath>true</addClasspath>

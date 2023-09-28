@@ -24,5 +24,5 @@ public class HelperUtils {
     public static LocalDateTime ToDateTime(String timestamp )
     {               
         return LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern(DATETIME_FORMAT));
-    }
+    }      
 }
