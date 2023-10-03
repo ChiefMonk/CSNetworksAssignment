@@ -21,14 +21,12 @@ public class ChatServer
     private static final int PORT = 4026;
     private static Set<ObjectOutputStream> clientWriters = new HashSet<>();
     private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
-
+ 
     public static void main(String[] args) 
-    {              
-        try
+    {    
+        try (ServerSocket serverSocket = new ServerSocket(PORT))
         {                                     
-            SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-            SSLServerSocket serverSocket = (SSLServerSocket) factory.createServerSocket(PORT);
-                    
+        
             System.out.println(String.format("The Secure Chat Server is running on port %s ...", PORT));
             
             while (true) 

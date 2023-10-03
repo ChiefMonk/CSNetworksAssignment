@@ -48,7 +48,8 @@ public class ChatClientGUI extends javax.swing.JFrame {
     
    private ObjectOutputStream _outputStream; 
    private ObjectInputStream _inputStream;
-   private SSLSocket _secureSocket;
+   
+   private Socket _socket;
        
     
     /**
@@ -526,12 +527,11 @@ public class ChatClientGUI extends javax.swing.JFrame {
      {      
         try {
             // Connect to the server
-            SSLSocketFactory factory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-            _secureSocket = (SSLSocket) factory.createSocket(_ipAddress, _portNumber);
+             _socket = new Socket(_ipAddress, _portNumber);
 
             // Create reader and writer            
-             _outputStream = new ObjectOutputStream(_secureSocket.getOutputStream());
-            _inputStream = new ObjectInputStream(_secureSocket.getInputStream());
+             _outputStream = new ObjectOutputStream(_socket.getOutputStream());
+            _inputStream = new ObjectInputStream(_socket.getInputStream());
            
             // _printWriter = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
 
