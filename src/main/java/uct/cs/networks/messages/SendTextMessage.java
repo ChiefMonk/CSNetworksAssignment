@@ -1,7 +1,8 @@
 package uct.cs.networks.messages;
 
-import uct.cs.networks.enums.Enums;
+import uct.cs.networks.enums.*;
 import uct.cs.networks.interfaces.IMessage;
+import uct.cs.networks.models.SystemUser;
 
 /**
  *
@@ -12,8 +13,8 @@ import uct.cs.networks.interfaces.IMessage;
  */
 public class SendTextMessage extends MessageBase implements IMessage {
     
-    public SendTextMessage(String message) {
-        super(Enums.MessageType.SendImageMessage, message);
+    public SendTextMessage(String message, SystemUser sender, SystemUser receiver) {
+        super(MessageType.SendText, message, sender, receiver);
     }    
 }
 

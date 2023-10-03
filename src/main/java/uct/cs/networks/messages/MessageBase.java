@@ -1,10 +1,10 @@
 package uct.cs.networks.messages;
 
 import java.io.Serializable;
-import uct.cs.networks.enums.Enums;
-import uct.cs.networks.interfaces.IMessage;
+import uct.cs.networks.enums.*;
 import uct.cs.networks.interfaces.IMessageBody;
 import uct.cs.networks.interfaces.IMessageHeader;
+import uct.cs.networks.models.SystemUser;
 
 /**
  *
@@ -18,20 +18,21 @@ public abstract class MessageBase implements Serializable {
     private IMessageHeader _header;
     private IMessageBody _body;
     
-    public MessageBase(Enums.MessageType type, String senderId, String receiverId)
+    public MessageBase(MessageType type, SystemUser sender, SystemUser receiver)
     {
-        _header = new MessageHeader(type, senderId, receiverId);
+        _header = new MessageHeader(type, sender, receiver);
+         _body = new MessageBody();
     }
     
-    public MessageBase(Enums.MessageType type, String message)
+    public MessageBase(MessageType type, String message, SystemUser sender, SystemUser receiver)
     {
-        _header = new MessageHeader(type, java.util.UUID.randomUUID().toString(), java.util.UUID.randomUUID().toString());
+         this(type, sender, receiver);       
         _body = new MessageBody(message);
     }
     
-    public MessageBase(Enums.MessageType type, Object data, String message)
+    public MessageBase(MessageType type, Object data, String message, SystemUser sender, SystemUser receiver)
     {
-        _header = new MessageHeader(type, java.util.UUID.randomUUID().toString(), java.util.UUID.randomUUID().toString());
+        this(type, sender, receiver);       
         _body = new MessageBody(data, message);
     }
     
@@ -51,7 +52,7 @@ public abstract class MessageBase implements Serializable {
        _body = body;
     }
       
-    @Override
+   @Override
    public String toString()
    {
        StringBuilder sb = new  StringBuilder();
@@ -61,6 +62,35 @@ public abstract class MessageBase implements Serializable {
        sb.append(String.format("Sender: %s\n", getHeader().getSenderId()));
        sb.append(String.format("Receiver: %s\n", getHeader().getReceiverId()));
        sb.append(String.format("Message: %s\n", getBody().getInfo()));
+    
+       return sb.toString();
+   }
+   
+    /**
+     *
+     * @return
+     */ 
+   public String toClientString()
+   {
+       StringBuilder sb = new  StringBuilder();
+       sb.append(String.format(" %s |", getHeader().getTimestamp()));
+       sb.append(String.format(" %s |", getHeader().getType()));       
+       sb.append(String.format(" %s |", getHeader().getId()));
+       sb.append(String.format(" %s |", getHeader().getSenderId()));       
+       sb.append(String.format(" %s", getBody().getInfo()));
+    
+       return sb.toString();
+   }
+   
+   public String toServerString()
+   {
+       StringBuilder sb = new  StringBuilder();
+       sb.append(String.format(" %s |", getHeader().getTimestamp()));
+       sb.append(String.format(" %s |", getHeader().getType()));       
+       sb.append(String.format(" %s |", getHeader().getId()));
+       sb.append(String.format(" %s |", getHeader().getSenderId()));
+       sb.append(String.format(" %s |", getHeader().getReceiverId()));
+       sb.append(String.format(" %s", getBody().getInfo()));
     
        return sb.toString();
    }

@@ -1,7 +1,7 @@
 package uct.cs.networks.messages;
 
 import uct.cs.networks.enums.*;
-import uct.cs.networks.interfaces.*;
+import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.models.SystemUser;
 
 /**
@@ -11,10 +11,9 @@ import uct.cs.networks.models.SystemUser;
  * @author Orefile Morule (MRLORE001@myuct.ac.za)
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
-public class SessionStartMessage extends MessageBase implements IMessage {
-
-    public SessionStartMessage(SystemUser sender, SystemUser receiver)
-    {
-        super(MessageType.SessionStart, sender, receiver);
-    }
+public class ValidateCertMessageRequest extends MessageBase implements IMessage {
+    
+    public ValidateCertMessageRequest(SystemUser sender, SystemUser receiver) {
+        super(MessageType.ValidateCertRequest, sender, receiver);
+    }    
 }

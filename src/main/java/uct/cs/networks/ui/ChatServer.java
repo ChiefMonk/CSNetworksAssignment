@@ -11,8 +11,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.utils.MessageFactory;
 
@@ -20,7 +18,7 @@ public class ChatServer
 {
     private static final int PORT = 4026;
     private static Set<ObjectOutputStream> clientWriters = new HashSet<>();
-    private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    private static final ExecutorService threadPool = Executors.newFixedThreadPool(10);
  
     public static void main(String[] args) 
     {    
@@ -67,7 +65,7 @@ public class ChatServer
                Object object;
                 while ((object = inputStream.readObject()) != null) {
                     IMessage message = MessageFactory.getMessage(object);
-                    System.out.println("Received: " + message);
+                    System.out.println(" =>:" + message.toServerString());
                     broadcastMessage(message);
                 }
             } 

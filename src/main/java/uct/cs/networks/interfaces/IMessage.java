@@ -13,5 +13,8 @@ public interface IMessage extends Serializable {
      public void setHeader(IMessageHeader header);
      
      public IMessageBody getBody();     
-     public void setBody(IMessageBody body);          
+     public void setBody(IMessageBody body);    
+     
+     public String toClientString();
+     public String toServerString();
 }

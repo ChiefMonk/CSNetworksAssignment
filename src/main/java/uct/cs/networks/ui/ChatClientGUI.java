@@ -6,9 +6,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Image;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.*;
@@ -18,9 +16,8 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.*;
 import java.net.Socket;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import uct.cs.networks.enums.Enums;
+import uct.cs.networks.enums.*;
+import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.utils.MessageFactory;
 
 /** 
@@ -43,13 +40,16 @@ public class ChatClientGUI extends javax.swing.JFrame {
     private String _ipAddress = "127.0.0.1";
     private int _portNumber = 4026;
     
-    private List<IMessage> _messageSendList;
+    private SystemUser _currentUser;
+    private List<SystemUser> _listOfUsers;
+        
+    private List<IMessage> _messageSentList;
     private List<IMessage> _messageReceivedList;
     
-   private ObjectOutputStream _outputStream; 
-   private ObjectInputStream _inputStream;
+    private ObjectOutputStream _outputStream; 
+    private ObjectInputStream _inputStream;
    
-   private Socket _socket;
+    private Socket _socket;
        
     
     /**
@@ -76,8 +76,11 @@ public class ChatClientGUI extends javax.swing.JFrame {
         buttonGroup.add(RadioButtonUser5);
         buttonGroup.add(RadioButtonUser6);
         
-       _messageSendList = new ArrayList<>();
-       _messageSendList = new ArrayList<>();
+       _messageSentList = new ArrayList<>();
+       _messageReceivedList = new ArrayList<>();
+       
+       _currentUser = new SystemUser("Chipo", "hmychi001@myuct.ac.za");
+       _listOfUsers = new ArrayList<>();
         
         _fileChooser = new JFileChooser();
         _fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif"));
@@ -108,11 +111,11 @@ public class ChatClientGUI extends javax.swing.JFrame {
         RadioButtonUser6 = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaOutput = new javax.swing.JTextArea();
-        ButtonVerifyQuery2 = new javax.swing.JButton();
+        ButtonLoadImage = new javax.swing.JButton();
         PanelOutputEntailAndJustify = new javax.swing.JPanel();
         textFieldInputMessage = new javax.swing.JTextField();
-        ButtonVerifyQuery1 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        ButtonSendMessage = new javax.swing.JButton();
+        ComboBoxMessageType = new javax.swing.JComboBox<>();
         PanelOutputExplanations = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         textAreaOutputExplanation = new javax.swing.JTextArea();
@@ -200,11 +203,11 @@ public class ChatClientGUI extends javax.swing.JFrame {
             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
-        ButtonVerifyQuery2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        ButtonVerifyQuery2.setText("Load Image");
-        ButtonVerifyQuery2.addActionListener(new java.awt.event.ActionListener() {
+        ButtonLoadImage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        ButtonLoadImage.setText("Load Image");
+        ButtonLoadImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonVerifyQuery2ActionPerformed(evt);
+                ButtonLoadImageActionPerformed(evt);
             }
         });
 
@@ -219,7 +222,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
                 .addGroup(PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelInputsLayout.createSequentialGroup()
-                        .addComponent(ButtonVerifyQuery2, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(ButtonLoadImage, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(49, 49, 49)))
                 .addContainerGap())
         );
@@ -231,7 +234,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
                     .addGroup(PanelInputsLayout.createSequentialGroup()
                         .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(ButtonVerifyQuery2))
+                        .addComponent(ButtonLoadImage))
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -240,18 +243,18 @@ public class ChatClientGUI extends javax.swing.JFrame {
 
         textFieldInputMessage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
-        ButtonVerifyQuery1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        ButtonVerifyQuery1.setText("Send Message");
-        ButtonVerifyQuery1.addActionListener(new java.awt.event.ActionListener() {
+        ButtonSendMessage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        ButtonSendMessage.setText("Send Message");
+        ButtonSendMessage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonVerifyQuery1ActionPerformed(evt);
+                ButtonSendMessageActionPerformed(evt);
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Session Start Message", "Verify Public Certificate", "Send Image with Caption Message", "Send Text Message", "Session End Message" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        ComboBoxMessageType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1. Session Start Message", "2. Verify Public Certificate", "3. Send Text Message", "4. Send Image with Caption Message", "5. Session End Message" }));
+        ComboBoxMessageType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                ComboBoxMessageTypeActionPerformed(evt);
             }
         });
 
@@ -261,23 +264,23 @@ public class ChatClientGUI extends javax.swing.JFrame {
             PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(textFieldInputMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ButtonVerifyQuery1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ButtonSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         PanelOutputEntailAndJustifyLayout.setVerticalGroup(
             PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelOutputEntailAndJustifyLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
             .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(ButtonVerifyQuery1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ButtonSendMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(textFieldInputMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
@@ -372,7 +375,9 @@ public class ChatClientGUI extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void ButtonVerifyQuery1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonVerifyQuery1ActionPerformed
+    private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonSendMessageActionPerformed
+                
+        var messageType = getMessageType(String.valueOf(ComboBoxMessageType.getSelectedItem()));
         
         String info = textFieldInputMessage.getText();
         
@@ -384,7 +389,10 @@ public class ChatClientGUI extends javax.swing.JFrame {
         
         try
         {   
-            IMessage message = MessageFactory.CreateMessage(Enums.MessageType.SendTextMessage, info);
+            IMessage message = MessageFactory.CreateMessage(_currentUser, _currentUser, messageType, null, info);
+            
+            if(message == null)
+                return;
 
             _outputStream.writeObject(message);                   
             _outputStream.flush();           
@@ -393,14 +401,13 @@ public class ChatClientGUI extends javax.swing.JFrame {
             ex.printStackTrace();
          }
          textFieldInputMessage.setText("");        // TODO add your handling code here:
-    }//GEN-LAST:event_ButtonVerifyQuery1ActionPerformed
+    }//GEN-LAST:event_ButtonSendMessageActionPerformed
 
-    private void ButtonVerifyQuery2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonVerifyQuery2ActionPerformed
+    private void ButtonLoadImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonLoadImageActionPerformed
         
         if (_fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)                                               
           return;
-        
-        
+                
          // Load an image using ImageIcon
         ImageIcon imageIcon = new ImageIcon(_fileChooser.getSelectedFile().getAbsolutePath()); // Replace with your image file path
         int imageWith = Labelmage.getHeight()-1;
@@ -408,11 +415,11 @@ public class ChatClientGUI extends javax.swing.JFrame {
         Image scaledImage = imageIcon.getImage().getScaledInstance(imageWith, imageWith, Image.SCALE_SMOOTH); 
         
         Labelmage.setIcon(new ImageIcon(scaledImage)); // TODO add your handling code here:
-    }//GEN-LAST:event_ButtonVerifyQuery2ActionPerformed
+    }//GEN-LAST:event_ButtonLoadImageActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void ComboBoxMessageTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxMessageTypeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_ComboBoxMessageTypeActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         
@@ -473,17 +480,13 @@ public class ChatClientGUI extends javax.swing.JFrame {
              System.exit(0);
         }    
     }
-    private void processReceivedMessage(String message)
-    {
-        textAreaOutput.append(String.format("%s\n", message));
-    }
     
     private void processReceivedMessage(IMessage message)
     {
         if(message == null)
             return;
         
-        textAreaOutput.append(String.format("%s\n", message.getBody().getInfo()));
+        textAreaOutput.append(String.format("%s\n", message.toClientString()));
     }
      // </editor-fold>
     
@@ -522,6 +525,26 @@ public class ChatClientGUI extends javax.swing.JFrame {
      
     
     // </editor-fold>
+     
+     private static MessageType getMessageType(String selection)
+     {
+        if(selection.startsWith("1."))
+            return MessageType.SessionStart;
+         
+        if(selection.startsWith("2."))
+            return MessageType.ValidateCertRequest;
+          
+        if(selection.startsWith("3."))
+            return MessageType.SendText;
+           
+        if(selection.startsWith("4."))
+            return MessageType.SendImage;
+            
+        if(selection.startsWith("5."))
+            return MessageType.SessionEnd;
+             
+        return MessageType.Unknown;
+     }
        
      private void startListener() 
      {      
@@ -598,6 +621,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new ChatClientGUI().setVisible(true);
             }
@@ -605,8 +629,9 @@ public class ChatClientGUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ButtonVerifyQuery1;
-    private javax.swing.JButton ButtonVerifyQuery2;
+    private javax.swing.JButton ButtonLoadImage;
+    private javax.swing.JButton ButtonSendMessage;
+    private javax.swing.JComboBox<String> ComboBoxMessageType;
     private javax.swing.JLabel Labelmage;
     private javax.swing.JMenu MenuItemServerSettings;
     private javax.swing.JPanel PanelInputs;
@@ -619,7 +644,6 @@ public class ChatClientGUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton RadioButtonUser4;
     private javax.swing.JRadioButton RadioButtonUser5;
     private javax.swing.JRadioButton RadioButtonUser6;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu2;

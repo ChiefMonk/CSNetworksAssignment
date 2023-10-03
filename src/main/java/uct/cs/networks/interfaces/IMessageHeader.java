@@ -1,7 +1,7 @@
 package uct.cs.networks.interfaces;
 
 import java.io.Serializable;
-import uct.cs.networks.enums.Enums;
+import uct.cs.networks.enums.*;
 
 /**
  *
@@ -10,7 +10,7 @@ import uct.cs.networks.enums.Enums;
 public interface IMessageHeader extends Serializable {    
     public String getId();
     public String getTimestamp();
-    public Enums.MessageType getType();   
+    public MessageType getType();   
     public String getSenderId();
     public String getReceiverId();
 }

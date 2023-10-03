@@ -1,6 +1,6 @@
 package uct.cs.networks.messages;
 
-import uct.cs.networks.enums.*;
+import uct.cs.networks.enums.MessageType;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.models.SystemUser;
 
@@ -11,10 +11,9 @@ import uct.cs.networks.models.SystemUser;
  * @author Orefile Morule (MRLORE001@myuct.ac.za)
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
-public class SessionEndMessage extends MessageBase implements IMessage {
+public class BroadcastSystemUsersMessage extends MessageBase implements IMessage {
     
-    public SessionEndMessage(SystemUser sender, SystemUser receiver) {
-        super(MessageType.SessionEnd, sender, receiver);
-    }
-    
+    public BroadcastSystemUsersMessage(SystemUser sender, SystemUser receiver) {
+        super(MessageType.ServerBroadcastUserList, sender, receiver);
+    }    
 }
