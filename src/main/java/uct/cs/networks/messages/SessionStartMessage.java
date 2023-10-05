@@ -39,4 +39,12 @@ public class SessionStartMessage extends MessageBase implements IMessage {
         }
     }
 
+    public Key getSessionKey() {
+        return sessionKey;
+    }
+
+    public void setSessionKey(Key key) {
+        this.sessionKey = key;
+    }
+
 }
