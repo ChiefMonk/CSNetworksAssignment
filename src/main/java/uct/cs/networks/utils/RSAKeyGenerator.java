@@ -139,8 +139,8 @@ public class RSAKeyGenerator {
             if ((identity == null) || (passPhrase == null)) {
                 System.out.println("Please specify both the idetity and passPhrase of the key");
             } else {
-                FileOutputStream out1 = new FileOutputStream("localKeys\\UserPrivateKey.asc");
-                FileOutputStream out2 = new FileOutputStream("localKeys\\UserPublicKey.asc");
+                FileOutputStream out1 = new FileOutputStream("keys\\UserPrivateKey.asc");
+                FileOutputStream out2 = new FileOutputStream("keys\\UserPublicKey.asc");
                 generateAndExportKeyRing(out1, out2, identity, passPhrase.toCharArray(), true);
             }
         } catch (Exception e) {

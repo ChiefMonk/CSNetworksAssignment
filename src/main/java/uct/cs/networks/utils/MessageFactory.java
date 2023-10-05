@@ -15,95 +15,78 @@ import static uct.cs.networks.enums.MessageType.ValidateCertResponse;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
+import uct.cs.networks.utils.ImageProcessor;
 
 /**
  *
  * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
  */
 public class MessageFactory {
-   
-    public static IMessage CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String message)
-    {
-        switch(type)
-        {
-            case SendText -> 
-            {
+
+    public static IMessage CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData,
+            String message) {
+        switch (type) {
+            case SendText -> {
                 return new SendTextMessage(message, sender, receiver);
             }
-            
-            case SendImage -> 
-            {
+
+            case SendImage -> {
                 return new SendImageMessage(imageData, message, sender, receiver);
             }
-            
-            case ValidateCertRequest -> 
-            {
+
+            case ValidateCertRequest -> {
                 return new ValidateCertMessageRequest(sender, receiver);
             }
-            
-            case ValidateCertResponse -> 
-            {
+
+            case ValidateCertResponse -> {
                 return new ValidateCertMessageResponse(sender, receiver);
             }
-            
-            case SessionStart -> 
-            {
+
+            case SessionStart -> {
                 return new SessionStartMessage(sender, receiver);
             }
-            
-            case SessionEnd -> 
-            {
+
+            case SessionEnd -> {
                 return new SessionEndMessage(sender, receiver);
             }
-            case ServerBroadcastUserList -> 
-            {
+            case ServerBroadcastUserList -> {
                 return new BroadcastSystemUsersMessage(sender, receiver);
             }
-            case ServerSendCertificate -> 
-            {
+            case ServerSendCertificate -> {
                 return new SendCertificateToServerMessage(sender, receiver);
             }
         }
-        
+
         return null;
     }
-       
-    
-    public static IMessage getMessage(Object obj) throws IOException, ClassNotFoundException
-    {
-        IMessage message = (IMessage)obj ;   
-       
-        switch(message.getHeader().getType())
-        {
-            case ValidateCertRequest -> 
-            {
-                return (ValidateCertMessageRequest)message;
+
+    public static IMessage getMessage(Object obj) throws IOException, ClassNotFoundException {
+        IMessage message = (IMessage) obj;
+
+        switch (message.getHeader().getType()) {
+            case ValidateCertRequest -> {
+                return (ValidateCertMessageRequest) message;
             }
-            
-            case ValidateCertResponse -> 
-            {
-                return (ValidateCertMessageResponse)message;
+
+            case ValidateCertResponse -> {
+                return (ValidateCertMessageResponse) message;
             }
-            
-            case SessionStart -> 
-            {
+
+            case SessionStart -> {
                 return (SessionStartMessage) message;
             }
-            
-            case SessionEnd -> 
-            {
-                return (SessionEndMessage)message;
+
+            case SessionEnd -> {
+                return (SessionEndMessage) message;
             }
-            case ServerBroadcastUserList -> 
-            {
-                return (BroadcastSystemUsersMessage)message;
+            case ServerBroadcastUserList -> {
+                return (BroadcastSystemUsersMessage) message;
             }
-            case ServerSendCertificate -> 
-            {
-                return (SendCertificateToServerMessage)message;
+            case ServerSendCertificate -> {
+                return (SendCertificateToServerMessage) message;
             }
         }
-        
+
         return message;
     }
 }
