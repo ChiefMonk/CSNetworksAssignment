@@ -22,7 +22,7 @@ public class BroadcastSystemUsersMessage extends MessageBase implements IMessage
 
     public BroadcastSystemUsersMessage(SystemUser sender, SystemUser receiver) {
         super(MessageType.ServerBroadcastUserList, sender, receiver);
-
+        user = sender;
     }
 
     public SystemUser getUser() {
