@@ -1,5 +1,8 @@
 package uct.cs.networks.models;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 import uct.cs.networks.utils.*;
 
 /**
@@ -50,7 +53,13 @@ public class SystemUser {
         return _secretKey;
     }
 
-    public String getPublicKey() {
-        return _publicKey;
+    public FileInputStream getPublicKey() {
+        FileInputStream pubKey = null;
+        try {
+            pubKey = new FileInputStream(_publicKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return pubKey;
     }
 }
