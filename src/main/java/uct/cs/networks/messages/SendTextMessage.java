@@ -13,8 +13,14 @@ import uct.cs.networks.models.SystemUser;
  */
 public class SendTextMessage extends MessageBase implements IMessage {
     
+    private Object _cipherText;
+    
     public SendTextMessage(String message, SystemUser sender, SystemUser receiver) {
         super(MessageType.SendText, message, sender, receiver);
-    }    
+    }   
+    
+    public Object getCipherText()
+    {
+        return _cipherText;
+    }
 }
-
