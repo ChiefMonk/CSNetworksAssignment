@@ -179,8 +179,8 @@ public class RSAKeyGenerator {
     }
 
     public static void main(String[] args) throws Exception {
-        String identity = "shaylin";
-        String passPhrase = "chetty";
+        String identity = "server";
+        String passPhrase = "networks";
         createKeys(identity, passPhrase);
 
     }
