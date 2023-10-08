@@ -6,6 +6,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import javax.crypto.KeyGenerator;
 
 import javax.crypto.BadPaddingException;
@@ -38,6 +43,24 @@ public class AESEncryption {
         return keyGenerator.generateKey();
     }
 
+    public String serializeKeyToString(Key key) throws Exception {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(key);
+        oos.close();
+        byte[] bytes = bos.toByteArray();
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    public Key deserializeKeyFromString(String keyString) throws Exception {
+        byte[] bytes = Base64.getDecoder().decode(keyString);
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Object obj = ois.readObject();
+        ois.close();
+        return (Key) obj;
+    }
+
     private void readBtyeArray(byte[] a) {
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + " ");
@@ -63,16 +86,17 @@ public class AESEncryption {
         }
     }
 
-    public void decrypt(String encrypted, Key key) {
+    public String decrypt(String encrypted, Key key) {
         try {
             Cipher cipher = Cipher.getInstance(MODE);
             byte[] values = Base64.getDecoder().decode(encrypted.getBytes());
             cipher.init(DECRYPT_MODE, key, new IvParameterSpec(IV.getBytes()));
             String decrypted = new String(cipher.doFinal(values));
-            System.out.println(decrypted);
+            return decrypted;
         } catch (Exception e) {
             System.out.println("Decrypting error");
             e.printStackTrace();
+            return null;
 
         }
     }
