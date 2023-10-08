@@ -1,7 +1,5 @@
 package uct.cs.networks.messages;
 
-import java.security.Key;
-
 import java.io.Serializable;
 import uct.cs.networks.enums.*;
 import uct.cs.networks.interfaces.IMessageBody;

@@ -8,6 +8,7 @@ package uct.cs.networks.utils;
 
 */
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
@@ -133,18 +136,46 @@ public class RSAKeyGenerator {
         publicOut.close();
     }
 
+   private static final String keysFolder = "keys";
+   private static final String privateKeyFile = "keys\\UserPrivateKey.asc";
+   private static final String publicKeyFile = "keys\\UserPublicKey.asc";
+    
     public static void createKeys(String identity, String passPhrase) {
         try {
+            createKeysFolder();
+            
             Security.addProvider(new BouncyCastleProvider());
             if ((identity == null) || (passPhrase == null)) {
-                System.out.println("Please specify both the idetity and passPhrase of the key");
+                System.out.println("Please specify both the identity and passPhrase of the key");                
             } else {
-                FileOutputStream out1 = new FileOutputStream("keys\\UserPrivateKey.asc");
-                FileOutputStream out2 = new FileOutputStream("keys\\UserPublicKey.asc");
+                
+                if(checkIfBothKeysExist())
+                    return; 
+                
+                FileOutputStream out1 = new FileOutputStream(privateKeyFile);
+                FileOutputStream out2 = new FileOutputStream(publicKeyFile);
                 generateAndExportKeyRing(out1, out2, identity, passPhrase.toCharArray(), true);
             }
-        } catch (Exception e) {
+        } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | PGPException ex) {
+              Logger.getLogger(RSAKeyGenerator.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
+    }
+    
+    private static void createKeysFolder()
+    {
+        File file = new File(keysFolder);
+        if(file.exists() && file.isDirectory())
+            return;
+        
+        file.mkdir();
+    }
+    
+    private static boolean checkIfBothKeysExist()
+    {
+        File priFile = new File(privateKeyFile);
+        File pubFile = new File(publicKeyFile);
+        
+       return (priFile.exists() && priFile.isFile() && pubFile.exists() && pubFile.isFile());            
     }
 
     public static void main(String[] args) throws Exception {

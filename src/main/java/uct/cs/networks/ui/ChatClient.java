@@ -5,7 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import com.formdev.flatlaf.FlatLightLaf;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
@@ -21,7 +24,7 @@ import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.utils.MessageFactory;
 
 /**
- * The ChatClientGUI is the main class for the Desktop Application.
+ * The ChatClient is the main class for the Desktop Application.
  * 
  * @author Shaylin Chetty (CHTSHA042@myuct.ac.za)
  * @author Chipo Hamayobe (HMYCHI001@myuct.ac.za)
@@ -31,7 +34,7 @@ import uct.cs.networks.utils.MessageFactory;
  * @version 1.0.1
  * @since 2023-09-21
  */
-public class ChatClientGUI extends javax.swing.JFrame {
+public class ChatClient extends javax.swing.JFrame {
 
     // static and final parameters
     private static final String ERROR_DEFAULT_TITLE = "Invalid Error Occurred";
@@ -54,10 +57,11 @@ public class ChatClientGUI extends javax.swing.JFrame {
     /**
      * Creates new form ToolGUI
      */
-    public ChatClientGUI() {
-        super("- SecureChatSystem : Demonstrating Secure Network Communication with Cryptographic Functions -");
+    public ChatClient() {
+        super("- SecureChatSystem CLIENT : Demonstrating Secure Network Communication with Cryptographic Functions -");
         initComponents();
-        this.setResizable(true);
+        this.setResizable(true);       
+        this.setVisible(true);
 
         this.setDefaultCloseOperation(javax.swing.JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -86,6 +90,8 @@ public class ChatClientGUI extends javax.swing.JFrame {
         _fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif"));
         _fileChooser.setCurrentDirectory(new java.io.File("."));
         _fileChooser.setDialogTitle("Select an Image File");
+
+        new ChatClientAuth(this);	
     }
 
     /**
@@ -95,7 +101,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -129,11 +135,13 @@ public class ChatClientGUI extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE));
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE));
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -167,40 +175,40 @@ public class ChatClientGUI extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel9)
-                                        .addComponent(RadioButtonUser1)
-                                        .addComponent(RadioButtonUser2)
-                                        .addComponent(RadioButtonUser3)
-                                        .addComponent(RadioButtonUser4)
-                                        .addComponent(RadioButtonUser5)
-                                        .addComponent(RadioButtonUser6))
-                                .addGap(43, 43, 43)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 892,
-                                        Short.MAX_VALUE)));
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addComponent(RadioButtonUser1)
+                    .addComponent(RadioButtonUser2)
+                    .addComponent(RadioButtonUser3)
+                    .addComponent(RadioButtonUser4)
+                    .addComponent(RadioButtonUser5)
+                    .addComponent(RadioButtonUser6))
+                .addGap(43, 43, 43)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 892, Short.MAX_VALUE))
+        );
         jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(RadioButtonUser1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(RadioButtonUser2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(RadioButtonUser3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(RadioButtonUser4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(RadioButtonUser5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(RadioButtonUser6)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 283,
-                                javax.swing.GroupLayout.PREFERRED_SIZE));
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(RadioButtonUser1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(RadioButtonUser2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(RadioButtonUser3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(RadioButtonUser4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(RadioButtonUser5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(RadioButtonUser6)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
 
         ButtonLoadImage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         ButtonLoadImage.setText("Load Image");
@@ -213,41 +221,32 @@ public class ChatClientGUI extends javax.swing.JFrame {
         javax.swing.GroupLayout PanelInputsLayout = new javax.swing.GroupLayout(PanelInputs);
         PanelInputs.setLayout(PanelInputsLayout);
         PanelInputsLayout.setHorizontalGroup(
-                PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(PanelInputsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(PanelInputsLayout
-                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 281,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelInputsLayout
-                                                .createSequentialGroup()
-                                                .addComponent(ButtonLoadImage, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                        159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(49, 49, 49)))
-                                .addContainerGap()));
+            PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelInputsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelInputsLayout.createSequentialGroup()
+                        .addComponent(ButtonLoadImage, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(49, 49, 49)))
+                .addContainerGap())
+        );
         PanelInputsLayout.setVerticalGroup(
-                PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(PanelInputsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(
-                                        PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addGroup(PanelInputsLayout.createSequentialGroup()
-                                                        .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                238, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addGap(18, 18, 18)
-                                                        .addComponent(ButtonLoadImage))
-                                                .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING,
-                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap()));
+            PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelInputsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelInputsLayout.createSequentialGroup()
+                        .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(ButtonLoadImage))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
 
-        PanelOutputEntailAndJustify
-                .setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
+        PanelOutputEntailAndJustify.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
 
         textFieldInputMessage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
@@ -259,50 +258,41 @@ public class ChatClientGUI extends javax.swing.JFrame {
             }
         });
 
-        ComboBoxMessageType.setModel(new javax.swing.DefaultComboBoxModel<>(
-                new String[] { "1. Session Start Message", "2. Verify Public Certificate", "3. Send Text Message",
-                        "4. Send Image with Caption Message", "5. Session End Message" }));
+        ComboBoxMessageType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1. Session Start Message", "2. Verify Public Certificate", "3. Send Text Message", "4. Send Image with Caption Message", "5. Session End Message" }));
         ComboBoxMessageType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ComboBoxMessageTypeActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout PanelOutputEntailAndJustifyLayout = new javax.swing.GroupLayout(
-                PanelOutputEntailAndJustify);
+        javax.swing.GroupLayout PanelOutputEntailAndJustifyLayout = new javax.swing.GroupLayout(PanelOutputEntailAndJustify);
         PanelOutputEntailAndJustify.setLayout(PanelOutputEntailAndJustifyLayout);
         PanelOutputEntailAndJustifyLayout.setHorizontalGroup(
-                PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(textFieldInputMessage)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(ButtonSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 159,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap()));
+            PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(textFieldInputMessage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ButtonSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
         PanelOutputEntailAndJustifyLayout.setVerticalGroup(
-                PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
-                                PanelOutputEntailAndJustifyLayout.createSequentialGroup()
-                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(15, 15, 15))
-                        .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(PanelOutputEntailAndJustifyLayout
-                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(ButtonSendMessage, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(textFieldInputMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 42,
-                                                Short.MAX_VALUE))
-                                .addContainerGap(8, Short.MAX_VALUE)));
+            PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelOutputEntailAndJustifyLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
+            .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(ButtonSendMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(textFieldInputMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
+                .addContainerGap(8, Short.MAX_VALUE))
+        );
 
-        PanelOutputExplanations
-                .setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
+        PanelOutputExplanations.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
 
         textAreaOutputExplanation.setEditable(false);
         textAreaOutputExplanation.setColumns(20);
@@ -316,52 +306,49 @@ public class ChatClientGUI extends javax.swing.JFrame {
         javax.swing.GroupLayout PanelOutputExplanationsLayout = new javax.swing.GroupLayout(PanelOutputExplanations);
         PanelOutputExplanations.setLayout(PanelOutputExplanationsLayout);
         PanelOutputExplanationsLayout.setHorizontalGroup(
-                PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(PanelOutputExplanationsLayout
-                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane7)
-                                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                                                .addComponent(jLabel8)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap()));
+            PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane7)
+                    .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
         PanelOutputExplanationsLayout.setVerticalGroup(
-                PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                                .addContainerGap()));
+            PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout PanelMainLayout = new javax.swing.GroupLayout(PanelMain);
         PanelMain.setLayout(PanelMainLayout);
         PanelMainLayout.setHorizontalGroup(
-                PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(PanelMainLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(PanelInputs, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap()));
+            PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelMainLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PanelInputs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
         PanelMainLayout.setVerticalGroup(
-                PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(PanelMainLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(PanelInputs, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap()));
+            PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelMainLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(PanelInputs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         MenuItemServerSettings.setText("File");
 
@@ -383,14 +370,13 @@ public class ChatClientGUI extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(PanelMain, javax.swing.GroupLayout.Alignment.TRAILING,
-                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                Short.MAX_VALUE));
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(PanelMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         pack();
         setLocationRelativeTo(null);
@@ -421,6 +407,13 @@ public class ChatClientGUI extends javax.swing.JFrame {
         }
         textFieldInputMessage.setText(""); // TODO add your handling code here:
     }// GEN-LAST:event_ButtonSendMessageActionPerformed
+   
+    private boolean isValidLogin(String username, String password) {
+        // Replace this with your actual authentication logic
+        return username.equals("yourUsername") && password.equals("yourPassword");
+    }
+
+
 
     private void ButtonLoadImageActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ButtonLoadImageActionPerformed
 
@@ -589,7 +582,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ChatClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
             receiveThread.start();
@@ -620,7 +613,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
             isLookSet = true;
 
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(ChatClientGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         if (!isLookSet) {
@@ -634,7 +627,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
                 }
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | javax.swing.UnsupportedLookAndFeelException ex) {
-                Logger.getLogger(ChatClientGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                Logger.getLogger(ChatClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
         }
         // </editor-fold>
@@ -643,7 +636,7 @@ public class ChatClientGUI extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new ChatClientGUI().setVisible(true);
+                new ChatClient().setVisible(true);
             }
         });
     }

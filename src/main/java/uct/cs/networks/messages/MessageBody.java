@@ -8,8 +8,12 @@ import uct.cs.networks.utils.ImageProcessor;
 
 /**
  *
- * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
+ * @author Shaylin Chetty (CHTSHA042@myuct.ac.za)
+ * @author Chipo Hamayobe (HMYCHI001@myuct.ac.za)
+ * @author Orefile Morule (MRLORE001@myuct.ac.za)
+ * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
+
 public class MessageBody implements IMessageBody {
 
     private String _info; // Caption
