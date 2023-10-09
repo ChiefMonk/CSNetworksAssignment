@@ -55,6 +55,54 @@ public class ChatServer extends javax.swing.JFrame {
         _chatClientList = new HashSet<>(); 
         _serverSocket = new ServerSocket(PORT_NUMBER);    
     }
+    
+    private void setCurrentTitle(String ipAddress)
+    {
+        String t = TITLE;
+        if(ipAddress != null && !ipAddress.isBlank())
+             t = String.format("%s : Listening on %s:%s",  TITLE,ipAddress, PORT_NUMBER);
+        
+        this.setTitle("<html><body><center>" + t + "</center></body></html>");
+    }
+    
+    private String getIpAddress()
+    {
+        String ipAddress = null;
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            
+            while (networkInterfaces.hasMoreElements()) 
+            {
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+                System.out.println(networkInterface.getName());
+                // Filter for Wi-Fi adapters (you can change this to suit your needs)
+                if (networkInterface.getName().startsWith("wlan") || networkInterface.getName().startsWith("eth")) 
+                {
+                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                                                           
+                    while (inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement(); 
+                          System.out.println(inetAddress.getHostAddress());
+                        // Check for IPv4 addresses and exclude loopback address
+                        if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4 && inetAddress.getHostAddress().length() < 15) {   
+                            ipAddress = inetAddress.getHostAddress();
+                           break;
+                        }
+                    }
+                }
+                
+                if(ipAddress != null)
+                    break;
+            }
+        } 
+        catch (Exception e) 
+        {           
+           e.printStackTrace();
+           return "127.0.0.1";
+        }
+        
+        return ipAddress;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -150,12 +198,15 @@ public class ChatServer extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void start() throws IOException 
-    {                        
+    {            
+        setCurrentTitle(getIpAddress());
+        
         while(true)
         {
             Socket socket = _serverSocket.accept();
             ChatClientHandler client = new ChatClientHandler(socket);
             _chatClientList.add(client);
+           
              threadPool.execute(client);          
         }       
     }
