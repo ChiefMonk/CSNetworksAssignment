@@ -1,6 +1,5 @@
 package uct.cs.networks.models;
 
-import java.io.File;
 import java.io.FileInputStream;
 
 import uct.cs.networks.utils.*;
@@ -16,25 +15,23 @@ import uct.cs.networks.utils.*;
 public class SystemUser {
     private final String _id;
     private final String _name;
-    private final String _emailAddress;
-    private final String _password;
+    private final String _emailAddress;   
     private String _secretKey;
     private String _publicKey; // file path to key
-
-    public SystemUser(String name, String emailAddress, String password, Boolean chatsWith) {
-        _id = java.util.UUID.randomUUID().toString();
+   
+    public SystemUser(SystemUserAuthentication authUser) {
+         this(authUser.getId(), authUser.getName(), authUser.getEmailAddress(), authUser.getKeyPassphrase());        
+    }
+     
+    public SystemUser (String id, String name, String emailAddress, String password)
+    {
+        _id = id;
         _name = name;
-        _emailAddress = emailAddress;
-        _password = password;
-        if (chatsWith) {
-            // Existing user attempting to chat with SystemUser
-        } else {
+        _emailAddress = emailAddress;             
             // Create new SystemUser with private and public key
-            RSAKeyGenerator keyGenerator = new RSAKeyGenerator();
-            keyGenerator.createKeys(name, password); // will create keys in path below
-            _publicKey = "keys\\UserPublicKey.asc";
-        }
-
+        RSAKeyGenerator keyGenerator = new RSAKeyGenerator();
+        keyGenerator.createKeys(name, password); // will create keys in path below
+        _publicKey = "keys\\UserPublicKey.asc";        
     }
 
     public String getId() {
@@ -53,7 +50,8 @@ public class SystemUser {
         return _secretKey;
     }
 
-    public FileInputStream getPublicKey() {
+    public FileInputStream getPublicKey() 
+    {
         FileInputStream pubKey = null;
         try {
             pubKey = new FileInputStream(_publicKey);

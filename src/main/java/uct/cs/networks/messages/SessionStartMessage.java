@@ -32,8 +32,8 @@ public class SessionStartMessage extends MessageBase implements IMessage {
             key = aesEncryption.getKeyFromKeyGenerator();
             this.sessionKey = key;
             // Create new messageBody and update original
-            MessageBody newBody = new MessageBody("Incoming chat with " + receiver.getName(), key);
-            setBody(newBody);
+           // MessageBody newBody = new MessageBody("Incoming chat with " + receiver.getName(), key);
+            //setBody(newBody);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -41,10 +41,5 @@ public class SessionStartMessage extends MessageBase implements IMessage {
 
     public Key getSessionKey() {
         return sessionKey;
-    }
-
-    public void setSessionKey(Key key) {
-        this.sessionKey = key;
-    }
-
+    }   
 }

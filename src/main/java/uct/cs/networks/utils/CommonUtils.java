@@ -28,6 +28,7 @@ import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
+import uct.cs.networks.interfaces.IMessage;
 
 public class CommonUtils {
 
@@ -135,6 +136,5 @@ public class CommonUtils {
             }
         }
         return Optional.empty();
-    }
-
+    }        
 }

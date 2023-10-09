@@ -1,17 +1,9 @@
 package uct.cs.networks.messages;
 
-import java.io.FileInputStream;
-import java.nio.charset.Charset;
-
-import org.bouncycastle.bcpg.CompressionAlgorithmTags;
-import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 
 import uct.cs.networks.enums.*;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.models.SystemUser;
-import uct.cs.networks.utils.PgpDecryptionUtil;
-import uct.cs.networks.utils.PgpEncryptionUtil;
-import uct.cs.networks.utils.EncryptionHelper;
 
 /**
  *
@@ -22,14 +14,16 @@ import uct.cs.networks.utils.EncryptionHelper;
  */
 public class SendTextMessage extends MessageBase implements IMessage {
 
-    private Object _cipherText;
+    private final String _textData;
 
-    public SendTextMessage(String message, SystemUser sender, SystemUser receiver) {
-        super(MessageType.SendText, message, sender, receiver);
+    public SendTextMessage(String textData, SystemUser sender, SystemUser receiver) {
+        super(MessageType.SendText, sender, receiver);
+        
+        _textData = textData;
     }
 
-    public Object getCipherText() {
-        return _cipherText;
+    public String getTextData() {
+        return _textData;
     }
 
 }

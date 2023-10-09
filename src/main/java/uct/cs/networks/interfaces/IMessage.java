@@ -1,6 +1,7 @@
 package uct.cs.networks.interfaces;
 
 import java.io.Serializable;
+import uct.cs.networks.enums.MessageType;
 
 
 /**
@@ -9,12 +10,12 @@ import java.io.Serializable;
  */
 public interface IMessage extends Serializable {    
     
-     public IMessageHeader getHeader();     
-     public void setHeader(IMessageHeader header);
-     
-     public IMessageBody getBody();     
-     public void setBody(IMessageBody body);    
-     
-     public String toClientString();
-     public String toServerString();
+    public String getId();   
+    public MessageType getType();   
+    public String getSender();
+    public String getReceiver();
+    
+    public String getMessageData();
+    public String toClientString();
+    public String toServerString();
 }

@@ -15,7 +15,7 @@ import static uct.cs.networks.enums.MessageType.ValidateCertResponse;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
-import uct.cs.networks.utils.ImageProcessor;
+import uct.cs.networks.proto.MessageProtocol;
 
 /**
  *
@@ -23,47 +23,71 @@ import uct.cs.networks.utils.ImageProcessor;
  */
 public class MessageFactory {
 
-    public static IMessage CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData,
-            String message) {
+    public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String textData) throws IOException
+    {
+       IMessage message = null;
+       boolean createHash = true;
         switch (type) {
             case SendText -> {
-                return new SendTextMessage(message, sender, receiver);
+                
+                message =  new SendTextMessage(textData, sender, receiver);
+                break;
             }
 
-            case SendImage -> {
-                return new SendImageMessage(imageData, message, sender, receiver);
+            case SendImageWithText -> {
+                message = new SendImageWithTextMessage(imageData, textData, sender, receiver);
+                break;
             }
 
             case ValidateCertRequest -> {
-                return new ValidateCertMessageRequest(sender, receiver);
+                message = new ValidateCertMessageRequest(sender, receiver);
+                break;
             }
 
             case ValidateCertResponse -> {
-                return new ValidateCertMessageResponse(sender, receiver);
+                message = new ValidateCertMessageResponse(sender, receiver);
+                break;
             }
 
             case SessionStart -> {
-                return new SessionStartMessage(sender, receiver);
+                message = new SessionStartMessage(sender, receiver);
+                createHash = false;
+                break;
             }
 
             case SessionEnd -> {
-                return new SessionEndMessage(sender, receiver);
+                message = new SessionEndMessage(sender, receiver);
+                createHash = false;
+                break;
             }
             case ServerBroadcastUserList -> {
-                return new BroadcastSystemUsersMessage(sender, receiver);
+                message = new BroadcastSystemUsersMessage(sender, receiver);
+                createHash = false;
+                break;
             }
             case ServerSendCertificate -> {
-                return new SendCertificateToServerMessage(sender, receiver);
+                message = new SendCertificateToServerMessage(sender, receiver);
+                createHash = false;
+                break;
             }
         }
 
+        if(message != null)
+            return new MessageProtocol(message, createHash);
+        
         return null;
     }
+    
+    public static MessageProtocol getMessage(Object obj) throws IOException, ClassNotFoundException 
+    {
+      return (MessageProtocol) obj;      
+    }
 
-    public static IMessage getMessage(Object obj) throws IOException, ClassNotFoundException {
+    private static IMessage getMessage2(Object obj) throws IOException, ClassNotFoundException 
+    {
         IMessage message = (IMessage) obj;
 
-        switch (message.getHeader().getType()) {
+        switch (message.getType()) {
             case ValidateCertRequest -> {
                 return (ValidateCertMessageRequest) message;
             }

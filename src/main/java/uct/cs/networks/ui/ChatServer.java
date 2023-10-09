@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.models.SystemUser;
+import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.utils.MessageFactory;
 
 /**
@@ -25,7 +26,8 @@ import uct.cs.networks.utils.MessageFactory;
  */
 public class ChatServer extends javax.swing.JFrame {
 
-     private static final String ERROR_DEFAULT_TITLE = "Application Error Occurred";
+    private static final String TITLE = "- SecureChatSystem SERVER : Demonstrating Secure Network Communication with Cryptographic Functions -";
+    private static final String ERROR_DEFAULT_TITLE = "Application Error Occurred";
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(20);
     private static final int PORT_NUMBER = 4026;  
     private ServerSocket _serverSocket = null;   
@@ -36,8 +38,9 @@ public class ChatServer extends javax.swing.JFrame {
      * Creates new form ToolGUI
      */
     public ChatServer()  throws IOException {
-        super("- SecureChatSystem SERVER : Demonstrating Secure Network Communication with Cryptographic Functions -");
+        super(TITLE);
         initComponents();
+        this.setTitle("<html><body><center>" + TITLE + "</center></body></html>");
         this.setResizable(true);       
         this.setVisible(true);
 
@@ -157,7 +160,7 @@ public class ChatServer extends javax.swing.JFrame {
         }       
     }
     
-    private void broadcastMessage(IMessage message) 
+    private void broadcastMessage(MessageProtocol message) 
     {           
         for (ChatClientHandler client : _chatClientList) 
         {
@@ -220,7 +223,7 @@ public class ChatServer extends javax.swing.JFrame {
             {
                 Object object;
                 while ((object = _inputStream.readObject()) != null) {
-                    IMessage message = MessageFactory.getMessage(object);
+                    MessageProtocol message = MessageFactory.getMessage(object);
                     appendInMessage(" =>:" + message.toServerString());
                     broadcastMessage(message);
                 }
@@ -236,7 +239,7 @@ public class ChatServer extends javax.swing.JFrame {
             }
         }
         
-        public void sendMessage(IMessage message)
+        public void sendMessage(MessageProtocol message)
         {           
             try
             {
@@ -268,7 +271,7 @@ public class ChatServer extends javax.swing.JFrame {
     
         private void createSystemUser()
         {
-            _systemUser = new SystemUser("User " + _userCounter, "User" + _userCounter+"@mail.co.za", "User " + _userCounter, rootPaneCheckingEnabled);
+            _systemUser = new SystemUser(java.util.UUID.randomUUID().toString(), "User " + _userCounter, "User" + _userCounter+"@mail.co.za", "User " + _userCounter);
         }
     }
     

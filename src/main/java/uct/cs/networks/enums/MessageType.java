@@ -14,7 +14,7 @@ package uct.cs.networks.enums;
         ValidateCertResponse,
         SessionStart,      
         SendText,
-        SendImage,       
+        SendImageWithText,       
         SessionEnd,
         ServerBroadcastUserList,  
         ServerSendCertificate,

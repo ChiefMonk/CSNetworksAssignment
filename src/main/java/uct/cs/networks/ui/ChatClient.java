@@ -5,22 +5,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import com.formdev.flatlaf.FlatLightLaf;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import uct.cs.networks.interfaces.IMessage;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.io.*;
 import java.net.Socket;
 import uct.cs.networks.enums.*;
+import static uct.cs.networks.enums.MessageType.SendImageWithText;
 import uct.cs.networks.models.SystemUser;
+import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.utils.MessageFactory;
 
 /**
@@ -37,9 +34,11 @@ import uct.cs.networks.utils.MessageFactory;
 public class ChatClient extends javax.swing.JFrame {
 
     // static and final parameters
+    private static final String TITLE = "- SecureChatSystem CLIENT : Demonstrating Secure Network Communication with Cryptographic Functions -";
     private static final String ERROR_DEFAULT_TITLE = "Invalid Error Occurred";
-    private static final int SCROLL_BUFFER_SIZE = 10;
+
     private final JFileChooser _fileChooser;
+    
     private String _ipAddress = "127.0.0.1";
     private int _portNumber = 4026;
 
@@ -58,10 +57,11 @@ public class ChatClient extends javax.swing.JFrame {
      * Creates new form ToolGUI
      */
     public ChatClient() {
-        super("- SecureChatSystem CLIENT : Demonstrating Secure Network Communication with Cryptographic Functions -");
+        super(TITLE);
         initComponents();
         this.setResizable(true);       
         this.setVisible(true);
+        this.setTitle("<html><body><center>" + TITLE + "</center></body></html>");
 
         this.setDefaultCloseOperation(javax.swing.JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -82,8 +82,7 @@ public class ChatClient extends javax.swing.JFrame {
 
         _messageSentList = new ArrayList<>();
         _messageReceivedList = new ArrayList<>();
-
-        _currentUser = new SystemUser("Chipo", "hmychi001@myuct.ac.za", "password", false);
+       
         _listOfUsers = new ArrayList<>();
 
         _fileChooser = new JFileChooser();
@@ -91,7 +90,7 @@ public class ChatClient extends javax.swing.JFrame {
         _fileChooser.setCurrentDirectory(new java.io.File("."));
         _fileChooser.setDialogTitle("Select an Image File");
 
-        new ChatClientAuth(this);	
+        jMenuItem1ActionPerformed(null);               
     }
 
     /**
@@ -395,7 +394,7 @@ public class ChatClient extends javax.swing.JFrame {
             startListener();
 
         try {
-            IMessage message = MessageFactory.CreateMessage(_currentUser, _currentUser, messageType, null, info);
+            MessageProtocol message = MessageFactory.CreateMessage(_currentUser, _currentUser, messageType, null, info);
 
             if (message == null)
                 return;
@@ -408,13 +407,7 @@ public class ChatClient extends javax.swing.JFrame {
         textFieldInputMessage.setText(""); // TODO add your handling code here:
     }// GEN-LAST:event_ButtonSendMessageActionPerformed
    
-    private boolean isValidLogin(String username, String password) {
-        // Replace this with your actual authentication logic
-        return username.equals("yourUsername") && password.equals("yourPassword");
-    }
-
-
-
+  
     private void ButtonLoadImageActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ButtonLoadImageActionPerformed
 
         if (_fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
@@ -436,55 +429,22 @@ public class ChatClient extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
 
-        String ipAddress = JOptionPane.showInputDialog(this, "Enter Server IP Address: ", "Server Settings",
-                JOptionPane.OK_CANCEL_OPTION);
+        var authForm = new ChatClientAuth(this);
+              
+        authForm.setVisible(true);                
+        var authUser = authForm.getSystemUserAuth();
+        authForm.dispose();
+         
+       if(authUser != null)
+       {        
+            _currentUser = new SystemUser(authUser);
+            _ipAddress = authUser.getServerIpAddress();
+            _portNumber = authUser.getPortNumber();
 
-        // Regular expression patterns for IPv4
-        String ipv4Pattern = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
-                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
-                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
-                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-
-        // Check if the given IP address matches the IPv4 or IPv6 pattern
-        Matcher matcherIPv4 = Pattern.compile(ipv4Pattern).matcher(ipAddress);
-
-        // Check if the InetAddress is a valid IP address
-        if (!matcherIPv4.matches()) {
-            showErrorPopupMessage("Invalid IP Address", "Please enter a valid Server IP Address");
-            return;
-        }
-
-        _ipAddress = ipAddress;
-
-        String portNumber = JOptionPane.showInputDialog(this, "Enter Server Port Number: ", "Server Settings",
-                JOptionPane.OK_CANCEL_OPTION);
-
-        try {
-            // Parse the port number as an integer
-            int port = Integer.parseInt(portNumber);
-
-            // Check if the port number is within the valid range (1 - 65535)
-            if (port >= 4000 && port <= 65535) {
-                _portNumber = port;
-            } else {
-                showErrorPopupMessage("Invalid Port Number",
-                        "Please enter a valid Server Port Number between 4000 and 65535");
-                return;
-            }
-        } catch (NumberFormatException ex) {
-            // If a NumberFormatException is thrown, the port number is not a valid integer
-            showErrorPopupMessage("Invalid Port Number",
-                    "Please enter a valid Server Port Number between 4000 and 65535", ex);
-            return;
-        }
-
-        // Handle user input (e.g., validate and use the IP and port)
-        if (ipAddress != null && portNumber != null) {
-            JOptionPane.showMessageDialog(null,
-                    "Server IP Address: " + ipAddress + "\nServer Port Number: " + portNumber);
             startListener();
-        } // TODO add your handling code here:
-    }// GEN-LAST:event_jMenuItem1ActionPerformed
+       }
+    }
+// GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void ButtonExitApplicationActionPerformed(java.awt.event.ActionEvent evt) {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",
@@ -494,7 +454,7 @@ public class ChatClient extends javax.swing.JFrame {
         }
     }
 
-    private void processReceivedMessage(IMessage message) {
+    private void processReceivedMessage(MessageProtocol message) {
         if (message == null)
             return;
 
@@ -551,7 +511,7 @@ public class ChatClient extends javax.swing.JFrame {
             return MessageType.SendText;
 
         if (selection.startsWith("4."))
-            return MessageType.SendImage;
+            return MessageType.SendImageWithText;
 
         if (selection.startsWith("5."))
             return MessageType.SessionEnd;
@@ -576,7 +536,7 @@ public class ChatClient extends javax.swing.JFrame {
                 try {
                     Object object;
                     while ((object = _inputStream.readObject()) != null) {
-                        IMessage message = MessageFactory.getMessage(object);
+                        MessageProtocol message = MessageFactory.getMessage(object);
                         processReceivedMessage(message);
                     }
                 } catch (IOException e) {

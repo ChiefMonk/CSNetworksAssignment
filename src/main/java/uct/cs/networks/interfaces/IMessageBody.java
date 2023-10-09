@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public interface IMessageBody extends Serializable {
 
-    public String getData();
+    public IMessage getMessage();
 
     public void setData(String data);
 

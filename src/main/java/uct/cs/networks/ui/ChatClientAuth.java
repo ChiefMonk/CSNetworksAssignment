@@ -1,24 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
- */
 package uct.cs.networks.ui;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+import uct.cs.networks.models.SystemUserAuthentication;
 
 /**
  *
  * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
  */
 public class ChatClientAuth extends javax.swing.JDialog {
-
+   
+    private SystemUserAuthentication _userAuth = null; 
+    
     /**
      * Creates new form ChatClientAuth
      * @param parent
      */
     public ChatClientAuth(javax.swing.JFrame parent) {
-        super(parent, "SecureChatSystem Client Authentication", true);
-        initComponents();
+        super(parent, true);
+        initComponents();      
         setLocationRelativeTo(parent);
-        setVisible(true);
+        TextFieldServerIpAddress.setHorizontalAlignment(JTextField.CENTER);
+        TextFieldServerPortNumber.setHorizontalAlignment(JTextField.CENTER);
+        TextFieldChatName.setHorizontalAlignment(JTextField.CENTER);
+        TextFieldEmailAddress.setHorizontalAlignment(JTextField.CENTER);
+        TextFieldPassphrase.setHorizontalAlignment(JTextField.CENTER);
+        setVisible(false);
     }
 
     /**
@@ -39,12 +50,15 @@ public class ChatClientAuth extends javax.swing.JDialog {
         TextFieldServerPortNumber = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        TextFieldPassphrase = new javax.swing.JPasswordField();
+        TextFieldEmailAddress = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         ButtonConnect = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         TextFieldChatName = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        TextFieldPassphrase = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -58,6 +72,7 @@ public class ChatClientAuth extends javax.swing.JDialog {
         jLabel2.setText("Server IP Address :");
 
         TextFieldServerIpAddress.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        TextFieldServerIpAddress.setText("127.0.0.1");
         TextFieldServerIpAddress.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 153, 255)));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -86,7 +101,9 @@ public class ChatClientAuth extends javax.swing.JDialog {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel3.setText("Server Port Number :");
 
+        TextFieldServerPortNumber.setEditable(false);
         TextFieldServerPortNumber.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        TextFieldServerPortNumber.setText("4026");
         TextFieldServerPortNumber.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 153, 255)));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -113,10 +130,10 @@ public class ChatClientAuth extends javax.swing.JDialog {
         jPanel5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 204, 255), 1, true));
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel5.setText("Your PrivateKey Passphrase :");
+        jLabel5.setText("Email Address");
 
-        TextFieldPassphrase.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        TextFieldPassphrase.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 153, 255)));
+        TextFieldEmailAddress.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        TextFieldEmailAddress.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 153, 255)));
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -126,7 +143,7 @@ public class ChatClientAuth extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(TextFieldPassphrase, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(TextFieldEmailAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -135,7 +152,7 @@ public class ChatClientAuth extends javax.swing.JDialog {
                 .addGap(5, 5, 5)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(TextFieldPassphrase, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
+                    .addComponent(TextFieldEmailAddress, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -195,6 +212,35 @@ public class ChatClientAuth extends javax.swing.JDialog {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
+        jPanel8.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 204, 255), 1, true));
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setText("Your PrivateKey Passphrase :");
+
+        TextFieldPassphrase.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        TextFieldPassphrase.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 153, 255)));
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(TextFieldPassphrase, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(TextFieldPassphrase, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -212,7 +258,8 @@ public class ChatClientAuth extends javax.swing.JDialog {
                             .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -227,7 +274,9 @@ public class ChatClientAuth extends javax.swing.JDialog {
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -241,21 +290,109 @@ public class ChatClientAuth extends javax.swing.JDialog {
     }
     
     private void ButtonConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonConnectActionPerformed
+        
+        String serverIp = TextFieldServerIpAddress.getText();
+        int serverPortNumber = 0;
+        String serverPort = TextFieldServerPortNumber.getText();          
         String username = TextFieldChatName.getText();
-        char[] passwordChars = TextFieldPassphrase.getPassword();
-        String password = new String(passwordChars);
-
-        // Check username and password (replace with your authentication logic)
-        if (isValidLogin(username, password)) 
+        String emailAddress = TextFieldEmailAddress.getText();
+        String password = null;
+        if(TextFieldPassphrase.getPassword() != null && TextFieldPassphrase.getPassword().length > 0)        
+            password = new String(TextFieldPassphrase.getPassword());
+        
+        if(!validateIpAddress(serverIp))
         {           
-            this.dispose(); // Close the login dialog
-        } 
+            return;
+        }
+        
+        if((serverPortNumber = validatePortNumber(serverPort)) == 0)
+        {           
+            return;
+        }
+        
+        if(username == null || username.isBlank() || username.length() < 3)
+        {      
+            showErrorPopupMessage("Invalid Chat Name", "Please enter a valid Chat Name of atleast 3 character e.g. Lion");
+            return;
+        }
+        
+        if(emailAddress == null || emailAddress.isBlank() || !emailAddress.contains("@"))
+        {      
+            showErrorPopupMessage("Invalid Email Address", "Please enter a valid Email Address e.g. jjjccc001@myuct.ac.za");
+            return;
+        }
+        
+        if(password == null || password.isBlank() || password.length() < 3)
+        {      
+            showErrorPopupMessage("Invalid Key Passphrase", "Please enter a valid Key Passphrase of atleast 3 character e.g. jcjc001");
+            return;
+        }
+        
+        _userAuth = new SystemUserAuthentication(serverIp, serverPortNumber, username, emailAddress, password);      
+        setVisible(false);
     }//GEN-LAST:event_ButtonConnectActionPerformed
    
+     public SystemUserAuthentication getSystemUserAuth() {
+        return _userAuth;
+    }
+
+    private void showErrorPopupMessage(String title, String errorMessage) 
+    {
+        if (errorMessage == null || errorMessage.isEmpty())
+            return;
+                
+        JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+    }  
+     
+     private boolean validateIpAddress(String ipAddress)
+     {
+          // Regular expression patterns for IPv4
+        String ipv4Pattern = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
+                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
+                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\." +
+                "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+        // Check if the given IP address matches the IPv4 or IPv6 pattern
+        Matcher matcherIPv4 = Pattern.compile(ipv4Pattern).matcher(ipAddress);
+       
+        if(!matcherIPv4.matches())
+        {
+            showErrorPopupMessage("Invalid IP Address", "Please enter a valid Server IP Address");
+        }
+        
+       return true;
+     }
+     
+     private int validatePortNumber(String portNumber)
+     { 
+        int portNum = 0;
+        try 
+        {
+            // Parse the port number as an integer
+            int port = Integer.parseInt(portNumber);
+
+            // Check if the port number is within the valid range (1 - 65535)
+            if (port >= 4000 && port <= 65535) 
+            {
+                portNum = port;
+            } 
+            else 
+            {
+                showErrorPopupMessage("Invalid Port Number", "Please enter a valid Server Port Number between 4000 and 65535");             
+            }
+        } 
+        catch (NumberFormatException ex) 
+        {           
+            showErrorPopupMessage("Invalid Port Number", "Please enter a valid Server Port Number between 4000 and 65535.\n" + ex);                    
+        }
+      
+      return portNum;
+     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ButtonConnect;
     private javax.swing.JTextField TextFieldChatName;
+    private javax.swing.JTextField TextFieldEmailAddress;
     private javax.swing.JPasswordField TextFieldPassphrase;
     private javax.swing.JTextField TextFieldServerIpAddress;
     private javax.swing.JTextField TextFieldServerPortNumber;
@@ -264,12 +401,12 @@ public class ChatClientAuth extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     // End of variables declaration//GEN-END:variables
 }

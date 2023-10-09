@@ -2,10 +2,15 @@ package uct.cs.networks.utils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.openpgp.PGPException;
+import uct.cs.networks.interfaces.IMessage;
 
 import uct.cs.networks.models.SystemUser;
 
@@ -77,6 +82,20 @@ public class EncryptionHelper {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static String createMessageDigest(IMessage message) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String data = message.getMessageData();
+            
+            byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hash);
+        } 
+        catch (NoSuchAlgorithmException e) {
+              e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
