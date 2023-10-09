@@ -7,7 +7,7 @@ package uct.cs.networks.utils;
 import java.io.IOException;
 import uct.cs.networks.enums.*;
 import static uct.cs.networks.enums.MessageType.ServerBroadcastUserList;
-import static uct.cs.networks.enums.MessageType.ServerSendCertificate;
+import static uct.cs.networks.enums.MessageType.SystemUserAuth;
 import static uct.cs.networks.enums.MessageType.SessionEnd;
 import static uct.cs.networks.enums.MessageType.SessionStart;
 import static uct.cs.networks.enums.MessageType.ValidateCertRequest;
@@ -65,8 +65,8 @@ public class MessageFactory {
                 createHash = false;
                 break;
             }
-            case ServerSendCertificate -> {
-                message = new SendCertificateToServerMessage(sender, receiver);
+            case SystemUserAuth -> {
+                message = new SystemUserAuthenticationMessage(sender);
                 createHash = false;
                 break;
             }
@@ -106,8 +106,8 @@ public class MessageFactory {
             case ServerBroadcastUserList -> {
                 return (BroadcastSystemUsersMessage) message;
             }
-            case ServerSendCertificate -> {
-                return (SendCertificateToServerMessage) message;
+            case SystemUserAuth -> {
+                return (SystemUserAuthenticationMessage) message;
             }
         }
 

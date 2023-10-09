@@ -17,5 +17,5 @@ package uct.cs.networks.enums;
         SendImageWithText,       
         SessionEnd,
         ServerBroadcastUserList,  
-        ServerSendCertificate,
+        SystemUserAuth,
     }

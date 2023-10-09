@@ -381,6 +381,21 @@ public class ChatClient extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void sendMessage(MessageProtocol message)                        
+    {
+       try 
+       {           
+            if (message == null)
+                return;
+
+            _outputStream.writeObject(message);
+            _outputStream.flush();
+        } 
+        catch (IOException ex) 
+        {
+            ex.printStackTrace();
+        } 
+    }
     private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ButtonSendMessageActionPerformed
 
         var messageType = getMessageType(String.valueOf(ComboBoxMessageType.getSelectedItem()));
@@ -395,13 +410,10 @@ public class ChatClient extends javax.swing.JFrame {
 
         try {
             MessageProtocol message = MessageFactory.CreateMessage(_currentUser, _currentUser, messageType, null, info);
-
-            if (message == null)
-                return;
-
-            _outputStream.writeObject(message);
-            _outputStream.flush();
-        } catch (IOException ex) {
+            sendMessage(message);            
+        } 
+        catch (IOException ex) 
+        {
             ex.printStackTrace();
         }
         textFieldInputMessage.setText(""); // TODO add your handling code here:
@@ -442,6 +454,15 @@ public class ChatClient extends javax.swing.JFrame {
             _portNumber = authUser.getPortNumber();
 
             startListener();
+            try
+            {
+                MessageProtocol message = MessageFactory.CreateMessage(_currentUser, null, MessageType.SystemUserAuth, null, null);
+                sendMessage(message);          
+            }
+            catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
        }
     }
 // GEN-LAST:event_jMenuItem1ActionPerformed

@@ -18,6 +18,7 @@ public class SystemUser {
     private final String _emailAddress;   
     private String _secretKey;
     private String _publicKey; // file path to key
+    private FileInputStream _publicKeyStream = null;
    
     public SystemUser(SystemUserAuthentication authUser) {
          this(authUser.getId(), authUser.getName(), authUser.getEmailAddress(), authUser.getKeyPassphrase());        
@@ -31,7 +32,16 @@ public class SystemUser {
             // Create new SystemUser with private and public key
         RSAKeyGenerator keyGenerator = new RSAKeyGenerator();
         keyGenerator.createKeys(name, password); // will create keys in path below
-        _publicKey = "keys\\UserPublicKey.asc";        
+        _publicKey = "keys\\UserPublicKey.asc";     
+        setPublicKey();
+    }
+    
+    public SystemUser (String id, String name, String emailAddress, FileInputStream publicKeyStream)
+    {
+        _id = id;
+        _name = name;
+        _emailAddress = emailAddress;                      
+        _publicKeyStream = publicKeyStream;        
     }
 
     public String getId() {
@@ -49,15 +59,17 @@ public class SystemUser {
     public String getSecretKey() {
         return _secretKey;
     }
+    
+     public FileInputStream getPublicKey() {
+        return _publicKeyStream;
+    }
 
-    public FileInputStream getPublicKey() 
-    {
-        FileInputStream pubKey = null;
+    private void setPublicKey() 
+    {      
         try {
-            pubKey = new FileInputStream(_publicKey);
+            _publicKeyStream = new FileInputStream(_publicKey);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        return pubKey;
+        }      
     }
 }
