@@ -3,12 +3,12 @@ package uct.cs.networks.ui;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Image;
-import java.io.IOException;
 import java.util.ArrayList;
-import javax.swing.JFileChooser;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import uct.cs.networks.interfaces.IMessage;
@@ -100,6 +100,7 @@ public class ChatClient extends javax.swing.JFrame {
         _fileChooser.setCurrentDirectory(new java.io.File("."));
         _fileChooser.setDialogTitle("Select an Image File");
 
+        ComboBoxMessageTypeActionPerformed(null);
         jMenuItem1ActionPerformed(null);               
     }
     
@@ -145,7 +146,7 @@ public class ChatClient extends javax.swing.JFrame {
         ComboBoxMessageType = new javax.swing.JComboBox<>();
         PanelOutputExplanations = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        textAreaOutputExplanation = new javax.swing.JTextArea();
+        textAreaOutputLogs = new javax.swing.JTextArea();
         jLabel8 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         MenuItemServerSettings = new javax.swing.JMenu();
@@ -315,11 +316,11 @@ public class ChatClient extends javax.swing.JFrame {
 
         PanelOutputExplanations.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
 
-        textAreaOutputExplanation.setEditable(false);
-        textAreaOutputExplanation.setColumns(20);
-        textAreaOutputExplanation.setRows(5);
-        textAreaOutputExplanation.setFocusable(false);
-        jScrollPane7.setViewportView(textAreaOutputExplanation);
+        textAreaOutputLogs.setEditable(false);
+        textAreaOutputLogs.setColumns(20);
+        textAreaOutputLogs.setRows(5);
+        textAreaOutputLogs.setFocusable(false);
+        jScrollPane7.setViewportView(textAreaOutputLogs);
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel8.setText("Output and Logs");
@@ -413,7 +414,7 @@ public class ChatClient extends javax.swing.JFrame {
             _outputStream.writeObject(message);
             _outputStream.flush();
             
-            _sendMessageIdList.add(message.getId());
+            _sendMessageIdList.add(message.getId());           
         } 
         catch (IOException ex) 
         {
@@ -431,8 +432,8 @@ public class ChatClient extends javax.swing.JFrame {
         
         try
         {                 
-            MessageProtocol message = MessageFactory.getMessage(messageObject);            
-            textAreaOutput.append(String.format("%s\n", message.toClientString()));             
+            MessageProtocol message = MessageFactory.getMessage(messageObject);  
+            appendTextAreaOutputLogs(message);               
             
             _receivedMessageIdList.add(message.getId());            
             var cipherBody = message.getCipherBody().toString();
@@ -445,9 +446,10 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
                 var actualMessage = (BroadcastSystemUsersMessage)messageBody.getMessage(); 
                 
-                if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                    return;
-                        
+               // if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+               //     return;
+                   
+                appendTextAreaLive(actualMessage);                  
                 processUserList(actualMessage.getUserList());               
             }
             
@@ -457,9 +459,12 @@ public class ChatClient extends javax.swing.JFrame {
                 var plainBody = cipherBody;                       
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
                 var actualMessage = (SessionStartMessage)messageBody.getMessage();   
+                    
+                 
+                // if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                //    return;
                 
-                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                    return;
+                appendTextAreaLive(actualMessage);   
             }
             
             if(message.getType() == MessageType.SessionEnd)
@@ -469,8 +474,10 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
                 var actualMessage = (SessionEndMessage)messageBody.getMessage();   
                 
-                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                    return;
+               //  if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                //    return;
+                
+                appendTextAreaLive(actualMessage);   
             }
             
             if(message.getType() == MessageType.ValidateCertResponse)
@@ -480,8 +487,10 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
                 var actualMessage = (ValidateCertMessageResponse)messageBody.getMessage();   
                 
-                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                    return;
+                // if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                //    return;
+                
+                appendTextAreaLive(actualMessage);   
             }
             
             if(message.getType() == MessageType.SendText)
@@ -491,8 +500,10 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
                 var actualMessage = (SendTextMessage)messageBody.getMessage();  
                 
-                if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                    return;
+                //if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                 //   return;
+                 
+                appendTextAreaLive(actualMessage);   
             }
             
             if(message.getType() == MessageType.SendImageWithText)
@@ -502,8 +513,11 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
                 var actualMessage = (SendImageWithTextMessage)messageBody.getMessage();   
                 
-                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                    return;
+                 //if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                   // return;
+                   
+                appendTextAreaLive(actualMessage);   
+                setImageIconToLabel(byteArrayToImageIcon(actualMessage.getImageData()));      
             }
         }
         catch (IOException | ClassNotFoundException ex) 
@@ -694,7 +708,7 @@ public class ChatClient extends javax.swing.JFrame {
                     
                     Path imagePath = Paths.get(_fileChooser.getSelectedFile().getAbsolutePath());   
                     
-                    if(Files.exists(imagePath))
+                    if(!Files.exists(imagePath))
                     {
                         showErrorPopupMessage(errorTitle, "Please select an Image File to send to the selected user");
                         return; 
@@ -702,8 +716,7 @@ public class ChatClient extends javax.swing.JFrame {
                                      
                     message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, Files.readAllBytes(imagePath), textData);          
                 }
-            }
-                        
+            }                        
         }
         catch (IOException ex) 
         {
@@ -720,17 +733,13 @@ public class ChatClient extends javax.swing.JFrame {
 
         if (_outputStream == null)
             startListener();
-
-        try {
-            MessageProtocol message = MessageFactory.CreateMessage(_currentUser, getSelectedUser(), messageType, null, info);
-            sendMessage(message);            
-        } 
-        catch (IOException ex) 
-        {
-            ex.printStackTrace();
-        }
-        textFieldInputMessage.setText(""); // TODO add your handling code here:
-    }// GEN-LAST:event_ButtonSendMessageActionPerformed
+        
+          sendMessage(message);   
+       
+        textFieldInputMessage.setText(""); 
+        textFieldInputMessage.setEnabled(true);
+        ButtonLoadImage.setVisible(true);
+    }
    
   
     private void ButtonLoadImageActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ButtonLoadImageActionPerformed
@@ -739,17 +748,23 @@ public class ChatClient extends javax.swing.JFrame {
             return;
 
         // Load an image using ImageIcon
-        ImageIcon imageIcon = new ImageIcon(_fileChooser.getSelectedFile().getAbsolutePath()); // Replace with your
-                                                                                               // image file path
-        int imageWith = Labelmage.getHeight() - 1;
-
-        Image scaledImage = imageIcon.getImage().getScaledInstance(imageWith, imageWith, Image.SCALE_SMOOTH);
-
-        Labelmage.setIcon(new ImageIcon(scaledImage)); // TODO add your handling code here:
+        ImageIcon imageIcon = new ImageIcon(_fileChooser.getSelectedFile().getAbsolutePath()); // Replace with your                                                                                               // image file path
+        setImageIconToLabel(imageIcon);       
     }// GEN-LAST:event_ButtonLoadImageActionPerformed
 
     private void ComboBoxMessageTypeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ComboBoxMessageTypeActionPerformed
-        // TODO add your handling code here:
+        
+        var messageType = getMessageType(String.valueOf(ComboBoxMessageType.getSelectedItem()));
+         
+        textFieldInputMessage.setEnabled(false);
+        ButtonLoadImage.setVisible(false);
+        
+        if(messageType == MessageType.SendText || messageType == MessageType.SendImageWithText)
+        {
+            textFieldInputMessage.setEnabled(true);
+            ButtonLoadImage.setVisible(true); 
+        }
+        
     }// GEN-LAST:event_ComboBoxMessageTypeActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -801,6 +816,52 @@ public class ChatClient extends javax.swing.JFrame {
                 
         JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
     }  
+    
+    private void setImageIconToLabel(ImageIcon imageIcon)
+    {
+        if(imageIcon == null)
+            return;
+        
+        int imageWith = Labelmage.getHeight() - 1;
+        Image scaledImage = imageIcon.getImage().getScaledInstance(imageWith, imageWith, Image.SCALE_SMOOTH);
+        Labelmage.setIcon(new ImageIcon(scaledImage)); 
+    }
+       
+    private ImageIcon byteArrayToImageIcon(byte[] imageData) throws IOException 
+    {
+        // Convert the byte array to an Image
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
+        java.awt.Image image = ImageIO.read(inputStream);
+
+        // Create an ImageIcon from the Image
+        return new ImageIcon(image);
+    }
+    
+    private void appendTextAreaLive(IMessage message)
+    {
+        if(message == null)        
+            return;
+                
+       appendTextAreaLive(message.toClientString());          
+    }
+    
+    private void appendTextAreaLive(String message)
+    {
+        textAreaOutput.append(String.format("IN:%s\n", message));
+        appendTextAreaOutputLogs(message);
+    }
+    
+    private void appendTextAreaOutputLogs(MessageProtocol message)
+    {
+        if(message == null)        
+            return;
+       appendTextAreaOutputLogs(message.toClientString());          
+    }
+    
+    private void appendTextAreaOutputLogs(String message)
+    {
+        textAreaOutputLogs.append(String.format("IN:%s\n", message));          
+    }
 
    
     // </editor-fold>
@@ -954,7 +1015,7 @@ public class ChatClient extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTextArea textAreaOutput;
-    private javax.swing.JTextArea textAreaOutputExplanation;
+    private javax.swing.JTextArea textAreaOutputLogs;
     private javax.swing.JTextField textFieldInputMessage;
     // End of variables declaration//GEN-END:variables
 }

@@ -15,7 +15,7 @@ public class SystemUserAuthenticationMessage extends MessageBase implements IMes
     
     private final SystemUser _user;
     public SystemUserAuthenticationMessage(SystemUser user) {
-        super(MessageType.SystemUserAuth, user);
+        super(MessageType.SystemUserAuth, user, null);
              
         _user = new SystemUser(user.getId(), user.getName(), user.getEmailAddress(), user.getPublicKey());
     } 

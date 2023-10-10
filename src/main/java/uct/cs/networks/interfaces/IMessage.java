@@ -11,6 +11,7 @@ import uct.cs.networks.enums.MessageType;
 public interface IMessage extends Serializable {    
     
     public String getId();   
+    public String getTimestamp();     
     public MessageType getType();   
     public String getSender();
     public String getReceiver();

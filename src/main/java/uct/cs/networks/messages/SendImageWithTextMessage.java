@@ -30,4 +30,26 @@ public class SendImageWithTextMessage extends MessageBase implements IMessage {
     public byte[] getImageData() {
         return _imageData;
     }
+    
+    /**
+     *
+     * @return
+     */
+    @Override
+    public String toClientString() {        
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toClientString());
+        sb.append(String.format(" %s |", getImageText()));       
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toServerString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toServerString());
+        sb.append(String.format(" %s |", getImageText()));      
+
+        return sb.toString();
+    }
 }

@@ -41,5 +41,26 @@ public class SessionStartMessage extends MessageBase implements IMessage {
 
     public Key getSessionKey() {
         return sessionKey;
-    }   
+    } 
+    
+    /**
+     *
+     * @return
+     */
+    @Override
+    public String toClientString() {        
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toClientString());
+        sb.append("Wants to start a chat |");       
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toServerString() {
+        StringBuilder sb = new StringBuilder();
+         sb.append("Wants to start a chat |");            
+
+        return sb.toString();
+    }
 }

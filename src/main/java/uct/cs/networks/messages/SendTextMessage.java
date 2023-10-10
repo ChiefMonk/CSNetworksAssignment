@@ -26,4 +26,25 @@ public class SendTextMessage extends MessageBase implements IMessage {
         return _textData;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
+    public String toClientString() {        
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toClientString());
+        sb.append(String.format(" %s |", getTextData()));       
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toServerString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toServerString());
+        sb.append(String.format(" %s |", getTextData()));      
+
+        return sb.toString();
+    }
 }

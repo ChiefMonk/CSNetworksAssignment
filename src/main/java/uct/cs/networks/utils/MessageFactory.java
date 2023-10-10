@@ -29,6 +29,16 @@ public class MessageFactory {
            return new MessageProtocol(new BroadcastSystemUsersMessage(sender, receiver, users), false);
     }
     
+    public static MessageProtocol CreateValidateCertMessageResponse(SystemUser sender, SystemUser receiver, SystemUser verifyUser, CertificateVerificationResult verificationResult) throws IOException
+    {
+           return new MessageProtocol(new ValidateCertMessageResponse(sender, receiver, verifyUser, verificationResult), false);
+    }
+    
+    public static MessageProtocol CreateValidateCertMessageRequest(SystemUser sender, SystemUser receiver, SystemUser verifyUser) throws IOException
+    {
+           return new MessageProtocol(new ValidateCertMessageRequest(sender, receiver, verifyUser), false);
+    }
+    
     public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String textData) throws IOException
     {
        IMessage message = null;
@@ -44,17 +54,7 @@ public class MessageFactory {
                 message = new SendImageWithTextMessage(sender, receiver, imageData, textData);
                 break;
             }
-
-            case ValidateCertRequest -> {
-                message = new ValidateCertMessageRequest(sender, receiver);
-                break;
-            }
-
-            case ValidateCertResponse -> {
-                message = new ValidateCertMessageResponse(sender, receiver);
-                break;
-            }
-
+            
             case SessionStart -> {
                 message = new SessionStartMessage(sender, receiver);
                 createHash = false;

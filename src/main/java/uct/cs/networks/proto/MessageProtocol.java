@@ -15,15 +15,17 @@ public class MessageProtocol implements Serializable {
     private final String _id;
     private final String _timestamp;
     private final MessageType _type;    
-    private final String _receiverId;
+    private final String _sender;
+    private final String _receiver;
     
     private Object _cipherBody;
     
     public MessageProtocol(IMessage message, boolean createHash) throws IOException  {
         _id = message.getId();      
         _timestamp = HelperUtils.GetCuttentUtcTimestamp();
-        _type = message.getType();                   
-        _receiverId = message.getReceiver();  
+        _type = message.getType();  
+        _sender = message.getSender();  
+        _receiver = message.getReceiver();  
         
         ProtocolBody body;     
         
@@ -50,8 +52,12 @@ public class MessageProtocol implements Serializable {
        return _type;
     }   
     
-    public String getReceiverId() {
-       return _receiverId;
+    public String getSender() {
+       return _sender;
+    }
+    
+    public String getReceiver() {
+       return _receiver;
     }
     
     public Object getCipherBody() {
@@ -66,16 +72,18 @@ public class MessageProtocol implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format(" %s |", getTimestamp()));
         sb.append(String.format(" %s |", getType()));
-        sb.append(String.format(" %s |", getId()));                
+        sb.append(String.format(" %s |", getId()));  
+        sb.append(String.format(" %s -> %s |", getSender(), getReceiver()));  
 
         return sb.toString();
     }
 
     public String toServerString() {
-        StringBuilder sb = new StringBuilder();
+         StringBuilder sb = new StringBuilder();
         sb.append(String.format(" %s |", getTimestamp()));
         sb.append(String.format(" %s |", getType()));
-        sb.append(String.format(" %s |", getId()));       
+        sb.append(String.format(" %s |", getId()));  
+        sb.append(String.format(" %s -> %s |", getSender(), getReceiver()));  
 
         return sb.toString();
     }

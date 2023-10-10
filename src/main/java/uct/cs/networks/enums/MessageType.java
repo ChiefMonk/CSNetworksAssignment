@@ -18,4 +18,4 @@ package uct.cs.networks.enums;
         SessionEnd,
         BroadcastUserList,  
         SystemUserAuth,
-    }
+}

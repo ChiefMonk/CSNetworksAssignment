@@ -3,6 +3,7 @@ package uct.cs.networks.messages;
 import java.io.Serializable;
 import uct.cs.networks.enums.*;
 import uct.cs.networks.models.SystemUser;
+import uct.cs.networks.utils.HelperUtils;
 
 /**
  *
@@ -12,33 +13,32 @@ import uct.cs.networks.models.SystemUser;
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
 public abstract class MessageBase implements Serializable {
-    private final String _id;   
+    private final String _id; 
+    private final String _timestamp;
     private final MessageType _type;    
     private String _sender; 
     private String _receiver;
 
     public MessageBase(MessageType type, SystemUser sender, SystemUser receiver) {
         _id = java.util.UUID.randomUUID().toString();
+        _timestamp = HelperUtils.GetCuttentUtcTimestamp();
         _type =  type;
-        _sender = "";
-        _receiver = "";
+        _sender = "The Server";
+        _receiver = "The Server";
    
         if(sender != null)
-            _sender = sender.getId();   
+            _sender = sender.getName();   
    
         if(receiver != null)
-            _receiver = receiver.getId();        
-    }
-    
-    public MessageBase(MessageType type, SystemUser sender) {
-        _id = java.util.UUID.randomUUID().toString();
-        _type =  type;
-        _sender = sender.getId(); 
-        _receiver  = "";
-    }
+            _receiver = receiver.getName();        
+    }       
     
     public String getId() {
         return _id;
+    }
+        
+    public String getTimestamp() {
+        return _timestamp;
     }
      
     public MessageType getType() {
@@ -59,6 +59,7 @@ public abstract class MessageBase implements Serializable {
                
        StringBuilder sb = new StringBuilder();
        sb.append(String.format("%s%s", getType(),seperator));
+       sb.append(String.format("%s%s", getTimestamp(),seperator));
        sb.append(String.format("%s%s", getId(),seperator));
        sb.append(String.format("%s%s", getSender(),seperator));
        sb.append(String.format("%s%s", getReceiver(),seperator));
@@ -70,6 +71,7 @@ public abstract class MessageBase implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Tm: %s\n", getTimestamp()));
         sb.append(String.format("Tp: %s\n", getType()));       
         sb.append(String.format("Id: %s\n", getId()));
         sb.append(String.format("Se: %s\n", getSender()));
@@ -84,16 +86,20 @@ public abstract class MessageBase implements Serializable {
      */
     public String toClientString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(String.format(" %s |", getTimestamp()));
         sb.append(String.format(" %s |", getType()));
-        sb.append(String.format(" %s |", getId()));                
+        sb.append(String.format(" %s |", getId()));  
+        sb.append(String.format(" %s -> %s |", getSender(), getReceiver()));  
 
         return sb.toString();
     }
 
     public String toServerString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(String.format(" %s |", getTimestamp()));
         sb.append(String.format(" %s |", getType()));
-        sb.append(String.format(" %s |", getId()));       
+        sb.append(String.format(" %s |", getId()));  
+        sb.append(String.format(" %s -> %s |", getSender(), getReceiver()));  
 
         return sb.toString();
     }

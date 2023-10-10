@@ -29,4 +29,25 @@ public class BroadcastSystemUsersMessage extends MessageBase implements IMessage
     public List<SystemUser> getUserList() {
         return _userList;
     }
+    
+     /**
+     *
+     * @return
+     */
+    @Override
+    public String toClientString() {        
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toClientString());
+        sb.append(String.format("Sent %s users |", _userList.size()));       
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toServerString() {
+       StringBuilder sb = new StringBuilder();
+       sb.append(String.format("Sent %s users |", _userList.size()));            
+
+       return sb.toString();
+    }
 }

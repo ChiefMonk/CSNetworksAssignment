@@ -17,4 +17,24 @@ public class SessionEndMessage extends MessageBase implements IMessage {
         super(MessageType.SessionEnd, sender, receiver);
     }
     
+    /**
+     *
+     * @return
+     */
+    @Override
+    public String toClientString() {        
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toClientString());
+        sb.append("Ended the chat |");       
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toServerString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Ended the chat |");              
+
+        return sb.toString();
+    }
 }
