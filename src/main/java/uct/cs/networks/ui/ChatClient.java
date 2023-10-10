@@ -14,6 +14,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import uct.cs.networks.interfaces.IMessage;
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import uct.cs.networks.enums.*;
 import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
@@ -46,10 +51,10 @@ public class ChatClient extends javax.swing.JFrame {
     private int _portNumber = 4026;
 
     private SystemUser _currentUser;
-    private List<SystemUser> _listOfUsers;
+    private Map<Integer, SystemUser> _listOfUsers;
     
     private List<String> _sendMessageIdList;
-    private List<String> _receivedMessageIdList;
+    private List<String> _receivedMessageIdList;   
 
     private ObjectOutputStream _outputStream;
     private ObjectInputStream _inputStream;
@@ -88,7 +93,7 @@ public class ChatClient extends javax.swing.JFrame {
         _sendMessageIdList = new ArrayList<>();
         _receivedMessageIdList = new ArrayList<>();
        
-        _listOfUsers = new ArrayList<>();
+        _listOfUsers = new HashMap<Integer, SystemUser>();
 
         _fileChooser = new JFileChooser();
         _fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif"));
@@ -529,16 +534,18 @@ public class ChatClient extends javax.swing.JFrame {
         boolean radioUser4Set =  false;
         boolean radioUser5Set =  false;
         
+       _listOfUsers = new HashMap<Integer, SystemUser>();
+        
        if(userList == null ||userList.isEmpty())
            return;
-           
-       
+                  
        for(SystemUser user : userList)
        { 
            if(user.getId().equals(HelperUtils.SERVER_ID))
            {
                RadioUserServer.setVisible(true);
                RadioUserServer.setText(user.getName());
+               _listOfUsers.put(0, user);
                continue;
            }
            
@@ -546,6 +553,7 @@ public class ChatClient extends javax.swing.JFrame {
            {
                RadioUser1.setVisible(true);
                RadioUser1.setText(String.format("%s (you)", user.getName()));
+               _listOfUsers.put(1, user);
                continue;
            }
            
@@ -554,6 +562,7 @@ public class ChatClient extends javax.swing.JFrame {
                RadioUser2.setVisible(true);
                RadioUser2.setText(user.getName()); 
                radioUser2Set = true;
+                _listOfUsers.put(2, user);
                continue;
            }
            
@@ -562,6 +571,7 @@ public class ChatClient extends javax.swing.JFrame {
                RadioUser3.setVisible(true);
                RadioUser3.setText(user.getName()); 
                radioUser3Set = true;
+                _listOfUsers.put(3, user);
                continue;
            }
             
@@ -570,6 +580,7 @@ public class ChatClient extends javax.swing.JFrame {
                RadioUser4.setVisible(true);
                RadioUser4.setText(user.getName()); 
                radioUser4Set = true;
+                _listOfUsers.put(4, user);
                continue;
            }
              
@@ -578,27 +589,140 @@ public class ChatClient extends javax.swing.JFrame {
                RadioUser5.setVisible(true);
                RadioUser5.setText(user.getName()); 
                radioUser5Set = true;
+                _listOfUsers.put(5, user);
                continue;
            }                     
        } 
        
        RadioUserServer.setSelected(true);
     }
+    
+    private SystemUser getSelectedUser()
+    {
+        if(RadioUserServer.isSelected())
+            return _listOfUsers.get(0);
+        
+        if(RadioUser1.isSelected())
+            return _listOfUsers.get(1);
+         
+        if(RadioUser2.isSelected())
+            return _listOfUsers.get(2);
+          
+       if(RadioUser3.isSelected())
+            return _listOfUsers.get(3);
+           
+        if(RadioUser4.isSelected())
+            return _listOfUsers.get(4);
+            
+        if(RadioUser5.isSelected())
+            return _listOfUsers.get(5);
+             
+        return null;
+    }
      
-    private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ButtonSendMessageActionPerformed
+    private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) 
+    {
 
+        String errorTitle = "Message Type Error";
+        
         var messageType = getMessageType(String.valueOf(ComboBoxMessageType.getSelectedItem()));
-
-        String info = textFieldInputMessage.getText();
-
-        if (info == null || info.isBlank())
+        MessageProtocol message = null;
+        var receiver = getSelectedUser();
+        
+        if (receiver == null || RadioUser1.isSelected())
+        {
+            showErrorPopupMessage(errorTitle, "Please select a valid user to send the message to. Not yourself");
             return;
+        }
+        
+        if(messageType == MessageType.ValidateCertRequest)
+        {
+            if(!RadioUserServer.isSelected())
+            {
+                showErrorPopupMessage(errorTitle, "Please select a 'The Server' for such type of message");
+                return;
+            }
+        }
+        else
+        {
+            if(RadioUserServer.isSelected() || RadioUser1.isSelected())
+            {
+                showErrorPopupMessage(errorTitle, "Please select a valid user to send the message to. Not the server or yourself");
+                return;
+            }
+        }
+        
+        try 
+        {        
+            // Message if for the server            
+            if(messageType == MessageType.SessionStart)
+            {                 
+                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);
+            } 
+            
+            if(messageType == MessageType.SessionEnd)
+            {
+               message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);         
+            }
+            
+            if(messageType == MessageType.ValidateCertRequest)
+            {
+              message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);         
+            }            
+            if(messageType == MessageType.SendText || messageType == MessageType.SendImageWithText)
+            {
+                String textData = textFieldInputMessage.getText();
+                 
+                if (textData == null || textData.isBlank())
+                {
+                    showErrorPopupMessage(errorTitle, "Please enter the Text Message to send to the selected user");
+                    return;
+                }
+                 
+                if(messageType == MessageType.SendText)
+                {
+                    message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, textData);
+                } 
+
+                if(messageType == MessageType.SendImageWithText)
+                {
+                    if(!_fileChooser.isFileSelectionEnabled() || _fileChooser.getSelectedFile() == null || !_fileChooser.getSelectedFile().isFile())
+                    {
+                        showErrorPopupMessage(errorTitle, "Please select an Image File to send to the selected user");
+                        return;
+                    }
+                    
+                    Path imagePath = Paths.get(_fileChooser.getSelectedFile().getAbsolutePath());   
+                    
+                    if(Files.exists(imagePath))
+                    {
+                        showErrorPopupMessage(errorTitle, "Please select an Image File to send to the selected user");
+                        return; 
+                    }
+                                     
+                    message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, Files.readAllBytes(imagePath), textData);          
+                }
+            }
+                        
+        }
+        catch (IOException ex) 
+        {
+           logException(ex);
+        }
+            
+
+       if(message == null)
+       {
+           showErrorPopupMessage(errorTitle, "Please select a valid message type and user to send the message");
+           return;
+       }
+      
 
         if (_outputStream == null)
             startListener();
 
         try {
-            MessageProtocol message = MessageFactory.CreateMessage(_currentUser, _currentUser, messageType, null, info);
+            MessageProtocol message = MessageFactory.CreateMessage(_currentUser, getSelectedUser(), messageType, null, info);
             sendMessage(message);            
         } 
         catch (IOException ex) 

@@ -16,7 +16,7 @@ public class SendImageWithTextMessage extends MessageBase implements IMessage {
     private final String _imageText;
     private final byte[] _imageData;
     
-    public SendImageWithTextMessage(byte[] imageData, String imageText, SystemUser sender, SystemUser receiver) {
+    public SendImageWithTextMessage(SystemUser sender, SystemUser receiver, byte[] imageData, String imageText) {
         super(MessageType.SendImageWithText, sender, receiver);    
         
         _imageData = imageData;

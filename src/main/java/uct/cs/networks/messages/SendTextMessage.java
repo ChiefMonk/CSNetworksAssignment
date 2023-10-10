@@ -16,7 +16,7 @@ public class SendTextMessage extends MessageBase implements IMessage {
 
     private final String _textData;
 
-    public SendTextMessage(String textData, SystemUser sender, SystemUser receiver) {
+    public SendTextMessage(SystemUser sender, SystemUser receiver, String textData) {
         super(MessageType.SendText, sender, receiver);
         
         _textData = textData;

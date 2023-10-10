@@ -36,12 +36,12 @@ public class MessageFactory {
         switch (type) {
             case SendText -> {
                 
-                message =  new SendTextMessage(textData, sender, receiver);
+                message =  new SendTextMessage(sender, receiver, textData);
                 break;
             }
 
             case SendImageWithText -> {
-                message = new SendImageWithTextMessage(imageData, textData, sender, receiver);
+                message = new SendImageWithTextMessage(sender, receiver, imageData, textData);
                 break;
             }
 
