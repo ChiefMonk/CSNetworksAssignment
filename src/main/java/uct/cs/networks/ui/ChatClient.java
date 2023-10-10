@@ -15,9 +15,12 @@ import uct.cs.networks.interfaces.IMessage;
 import java.io.*;
 import java.net.Socket;
 import uct.cs.networks.enums.*;
-import static uct.cs.networks.enums.MessageType.SendImageWithText;
+import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
+import uct.cs.networks.proto.ProtocolBody;
+import uct.cs.networks.utils.EncryptionHelper;
+import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
 
 /**
@@ -44,9 +47,9 @@ public class ChatClient extends javax.swing.JFrame {
 
     private SystemUser _currentUser;
     private List<SystemUser> _listOfUsers;
-
-    private List<IMessage> _messageSentList;
-    private List<IMessage> _messageReceivedList;
+    
+    private List<String> _sendMessageIdList;
+    private List<String> _receivedMessageIdList;
 
     private ObjectOutputStream _outputStream;
     private ObjectInputStream _inputStream;
@@ -73,17 +76,17 @@ public class ChatClient extends javax.swing.JFrame {
 
         // Create a button group to group the radio buttons
         ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(RadioButtonUser1);
-        buttonGroup.add(RadioButtonUser2);
-        buttonGroup.add(RadioButtonUser3);
-        buttonGroup.add(RadioButtonUser4);
-        buttonGroup.add(RadioButtonUser5);
-        buttonGroup.add(RadioButtonUser6);
+        buttonGroup.add(RadioUserServer);
+        buttonGroup.add(RadioUser1);
+        buttonGroup.add(RadioUser2);
+        buttonGroup.add(RadioUser3);
+        buttonGroup.add(RadioUser4);
+        buttonGroup.add(RadioUser5);
         
         onLoading();
-
-        _messageSentList = new ArrayList<>();
-        _messageReceivedList = new ArrayList<>();
+       
+        _sendMessageIdList = new ArrayList<>();
+        _receivedMessageIdList = new ArrayList<>();
        
         _listOfUsers = new ArrayList<>();
 
@@ -98,6 +101,7 @@ public class ChatClient extends javax.swing.JFrame {
     private void onLoading()
     {
         PanelMain.setVisible(false);
+        processUserList(null);
     }
     
     private void onSessionStart()
@@ -120,13 +124,13 @@ public class ChatClient extends javax.swing.JFrame {
         PanelInputs = new javax.swing.JPanel();
         Labelmage = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        RadioButtonUser1 = new javax.swing.JRadioButton();
+        RadioUserServer = new javax.swing.JRadioButton();
         jLabel9 = new javax.swing.JLabel();
-        RadioButtonUser2 = new javax.swing.JRadioButton();
-        RadioButtonUser3 = new javax.swing.JRadioButton();
-        RadioButtonUser4 = new javax.swing.JRadioButton();
-        RadioButtonUser5 = new javax.swing.JRadioButton();
-        RadioButtonUser6 = new javax.swing.JRadioButton();
+        RadioUser1 = new javax.swing.JRadioButton();
+        RadioUser2 = new javax.swing.JRadioButton();
+        RadioUser3 = new javax.swing.JRadioButton();
+        RadioUser4 = new javax.swing.JRadioButton();
+        RadioUser5 = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaOutput = new javax.swing.JTextArea();
         ButtonLoadImage = new javax.swing.JButton();
@@ -162,20 +166,20 @@ public class ChatClient extends javax.swing.JFrame {
         PanelInputs.setAlignmentX(1.0F);
         PanelInputs.setAlignmentY(1.0F);
 
-        RadioButtonUser1.setText("TheSever");
+        RadioUserServer.setText("The Sever");
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel9.setText("List of Users");
 
-        RadioButtonUser2.setText("User2");
+        RadioUser1.setText("User 1");
 
-        RadioButtonUser3.setText("User3");
+        RadioUser2.setText("User 2");
 
-        RadioButtonUser4.setText("User4");
+        RadioUser3.setText("User 3");
 
-        RadioButtonUser5.setText("User5");
+        RadioUser4.setText("User 4");
 
-        RadioButtonUser6.setText("User6");
+        RadioUser5.setText("User 5");
 
         textAreaOutput.setEditable(false);
         textAreaOutput.setColumns(20);
@@ -191,12 +195,12 @@ public class ChatClient extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel9)
-                    .addComponent(RadioButtonUser1)
-                    .addComponent(RadioButtonUser2)
-                    .addComponent(RadioButtonUser3)
-                    .addComponent(RadioButtonUser4)
-                    .addComponent(RadioButtonUser5)
-                    .addComponent(RadioButtonUser6))
+                    .addComponent(RadioUserServer)
+                    .addComponent(RadioUser1)
+                    .addComponent(RadioUser2)
+                    .addComponent(RadioUser3)
+                    .addComponent(RadioUser4)
+                    .addComponent(RadioUser5))
                 .addGap(31, 31, 31)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
                 .addContainerGap())
@@ -207,17 +211,17 @@ public class ChatClient extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioButtonUser1)
+                .addComponent(RadioUserServer)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioButtonUser2)
+                .addComponent(RadioUser1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioButtonUser3)
+                .addComponent(RadioUser2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioButtonUser4)
+                .addComponent(RadioUser3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioButtonUser5)
+                .addComponent(RadioUser4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioButtonUser6)
+                .addComponent(RadioUser5)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
@@ -399,16 +403,188 @@ public class ChatClient extends javax.swing.JFrame {
        try 
        {           
             if (message == null)
-                return;
+                return;                        
 
             _outputStream.writeObject(message);
             _outputStream.flush();
+            
+            _sendMessageIdList.add(message.getId());
         } 
         catch (IOException ex) 
         {
             ex.printStackTrace();
         } 
     }
+    
+    private void processReceivedMessage(MessageProtocol messageObject) {       
+       
+        if(messageObject == null)
+            return;
+         
+        if(_receivedMessageIdList == null || _receivedMessageIdList.isEmpty())
+                _receivedMessageIdList = new ArrayList<>();
+        
+        try
+        {                 
+            MessageProtocol message = MessageFactory.getMessage(messageObject);            
+            textAreaOutput.append(String.format("%s\n", message.toClientString()));             
+            
+            _receivedMessageIdList.add(message.getId());            
+            var cipherBody = message.getCipherBody().toString();
+            
+            // Message if for the server
+            if(message.getType() == MessageType.BroadcastUserList)
+            {              
+                // decrypt
+                var plainBody = cipherBody;                       
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
+                var actualMessage = (BroadcastSystemUsersMessage)messageBody.getMessage(); 
+                
+                if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                    return;
+                        
+                processUserList(actualMessage.getUserList());               
+            }
+            
+            if(message.getType() == MessageType.SessionStart)
+            {
+              // decrypt
+                var plainBody = cipherBody;                       
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
+                var actualMessage = (SessionStartMessage)messageBody.getMessage();   
+                
+                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                    return;
+            }
+            
+            if(message.getType() == MessageType.SessionEnd)
+            {
+              // decrypt
+                var plainBody = cipherBody;                       
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
+                var actualMessage = (SessionEndMessage)messageBody.getMessage();   
+                
+                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                    return;
+            }
+            
+            if(message.getType() == MessageType.ValidateCertResponse)
+            {
+              // decrypt
+                var plainBody = cipherBody;                       
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
+                var actualMessage = (ValidateCertMessageResponse)messageBody.getMessage();   
+                
+                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                    return;
+            }
+            
+            if(message.getType() == MessageType.SendText)
+            {
+              // decrypt
+                var plainBody = cipherBody;                       
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
+                var actualMessage = (SendTextMessage)messageBody.getMessage();  
+                
+                if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                    return;
+            }
+            
+            if(message.getType() == MessageType.SendImageWithText)
+            {
+              // decrypt
+                var plainBody = cipherBody;                       
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
+                var actualMessage = (SendImageWithTextMessage)messageBody.getMessage();   
+                
+                 if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
+                    return;
+            }
+        }
+        catch (IOException | ClassNotFoundException ex) 
+        {
+             logException(ex);
+        }                 
+    }
+    
+    private boolean validateHashAgainstMessage(IMessage message, String hashDigest)
+    {
+        if(hashDigest == null || hashDigest.isBlank())
+            return true;
+        
+        return (EncryptionHelper.createMessageDigest(message).equals(hashDigest));
+    }
+    
+    private void processUserList(List<SystemUser> userList)
+    {
+        RadioUserServer.setVisible(false);
+        RadioUser1.setVisible(false);
+        RadioUser2.setVisible(false);
+        RadioUser3.setVisible(false);
+        RadioUser4.setVisible(false);
+        RadioUser5.setVisible(false);
+        
+        boolean radioUser2Set =  false;
+        boolean radioUser3Set =  false;
+        boolean radioUser4Set =  false;
+        boolean radioUser5Set =  false;
+        
+       if(userList == null ||userList.isEmpty())
+           return;
+           
+       
+       for(SystemUser user : userList)
+       { 
+           if(user.getId().equals(HelperUtils.SERVER_ID))
+           {
+               RadioUserServer.setVisible(true);
+               RadioUserServer.setText(user.getName());
+               continue;
+           }
+           
+           if(user.getId().equals(_currentUser.getId()))
+           {
+               RadioUser1.setVisible(true);
+               RadioUser1.setText(String.format("%s (you)", user.getName()));
+               continue;
+           }
+           
+           if(!radioUser2Set)
+           {
+               RadioUser2.setVisible(true);
+               RadioUser2.setText(user.getName()); 
+               radioUser2Set = true;
+               continue;
+           }
+           
+           if(!radioUser3Set)
+           {
+               RadioUser3.setVisible(true);
+               RadioUser3.setText(user.getName()); 
+               radioUser3Set = true;
+               continue;
+           }
+            
+           if(!radioUser4Set)
+           {
+               RadioUser4.setVisible(true);
+               RadioUser4.setText(user.getName()); 
+               radioUser4Set = true;
+               continue;
+           }
+             
+           if(!radioUser5Set)
+           {
+               RadioUser5.setVisible(true);
+               RadioUser5.setText(user.getName()); 
+               radioUser5Set = true;
+               continue;
+           }                     
+       } 
+       
+       RadioUserServer.setSelected(true);
+    }
+     
     private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ButtonSendMessageActionPerformed
 
         var messageType = getMessageType(String.valueOf(ComboBoxMessageType.getSelectedItem()));
@@ -487,32 +663,26 @@ public class ChatClient extends javax.swing.JFrame {
             System.exit(0);
         }
     }
-
-    private void processReceivedMessage(MessageProtocol message) {
-        if (message == null)
-            return;
-
-        textAreaOutput.append(String.format("%s\n", message.toClientString()));
+    
+    private void logException(Exception ex)
+    {
+        ex.printStackTrace();
+        Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);                 
     }
+    
+    private void showErrorPopupMessage(String title, String errorMessage) 
+    {
+        if (errorMessage == null || errorMessage.isEmpty())
+            return;
+                
+        JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+    }  
+
+   
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ERROR MESSAGES">
-    /**
-     * shows a message popup
-     * 
-     * @param title
-     * @param errorMessage
-     */
-    private void showErrorPopupMessage(String title, String errorMessage) {
-        if (errorMessage == null || errorMessage.isEmpty())
-            return;
-
-        if (title == null || title.isEmpty())
-            title = ERROR_DEFAULT_TITLE;
-
-        JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
-    }
-
+    
     /**
      * shows a message popup
      * 
@@ -644,12 +814,12 @@ public class ChatClient extends javax.swing.JFrame {
     private javax.swing.JPanel PanelMain;
     private javax.swing.JPanel PanelOutputEntailAndJustify;
     private javax.swing.JPanel PanelOutputExplanations;
-    private javax.swing.JRadioButton RadioButtonUser1;
-    private javax.swing.JRadioButton RadioButtonUser2;
-    private javax.swing.JRadioButton RadioButtonUser3;
-    private javax.swing.JRadioButton RadioButtonUser4;
-    private javax.swing.JRadioButton RadioButtonUser5;
-    private javax.swing.JRadioButton RadioButtonUser6;
+    private javax.swing.JRadioButton RadioUser1;
+    private javax.swing.JRadioButton RadioUser2;
+    private javax.swing.JRadioButton RadioUser3;
+    private javax.swing.JRadioButton RadioUser4;
+    private javax.swing.JRadioButton RadioUser5;
+    private javax.swing.JRadioButton RadioUserServer;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu2;

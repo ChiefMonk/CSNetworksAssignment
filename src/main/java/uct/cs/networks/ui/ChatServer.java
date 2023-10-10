@@ -73,7 +73,7 @@ public class ChatServer extends javax.swing.JFrame {
     
     private void loadServerUser()
     {
-        _serverUser = new SystemUser("388f371c-b0d8-4dbc-a36b-0e4303a472d9", "The Server", "chatserver@cs.uct.ac.za", "chatserver001");
+        _serverUser = new SystemUser(HelperUtils.SERVER_ID, "The Server", "chatserver@cs.uct.ac.za", "chatserver001");
     }
     
     private String getIpAddress()
@@ -85,7 +85,7 @@ public class ChatServer extends javax.swing.JFrame {
             while (networkInterfaces.hasMoreElements()) 
             {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                System.out.println(networkInterface.getName());
+               // System.out.println(networkInterface.getName());
                 // Filter for Wi-Fi adapters (you can change this to suit your needs)
                 if (networkInterface.getName().startsWith("wlan") || networkInterface.getName().startsWith("eth")) 
                 {
@@ -93,7 +93,7 @@ public class ChatServer extends javax.swing.JFrame {
                                                            
                     while (inetAddresses.hasMoreElements()) {
                         InetAddress inetAddress = inetAddresses.nextElement(); 
-                          System.out.println(inetAddress.getHostAddress());
+                        //  System.out.println(inetAddress.getHostAddress());
                         // Check for IPv4 addresses and exclude loopback address
                         if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4 && inetAddress.getHostAddress().length() < 15) {   
                             ipAddress = inetAddress.getHostAddress();
@@ -407,7 +407,8 @@ public class ChatServer extends javax.swing.JFrame {
         
         String m = String.format(" IN: %s\n", message);         
         TextAreaMain.append(m);
-        System.out.println(m);         
+        System.out.println(m);   
+        logInfor(m);
      }
      
      private void appendInMessage(IMessage message)
@@ -415,7 +416,8 @@ public class ChatServer extends javax.swing.JFrame {
           if(message == null)
             return;
           
-       appendInMessage(message.toServerString());                   
+       appendInMessage(message.toServerString());   
+       logInfor(message.toServerString());
      }
      
      private void appendOutMessage(String message)
@@ -425,7 +427,8 @@ public class ChatServer extends javax.swing.JFrame {
         
         String m = String.format(" OUT: %s\n", message);         
         TextAreaMain.append(m);
-        System.out.println(m);         
+        System.out.println(m);     
+        logInfor(m);
      }
      
      private void appendOutMessage(IMessage message)
@@ -433,14 +436,20 @@ public class ChatServer extends javax.swing.JFrame {
           if(message == null)
             return;
           
-       appendOutMessage(message.toServerString());                 
+       appendOutMessage(message.toServerString());   
+       logInfor(message.toServerString());
      }
      
-      private void logException(Exception ex)
-     {
+    private void logException(Exception ex)
+    {
           ex.printStackTrace();
           Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
-     }
+    }
+    
+    private void logInfor(String info)
+    {         
+        Logger.getLogger(getClass().getName()).log(Level.INFO, info);
+    }
    
     private void ButtonExitApplicationActionPerformed(java.awt.event.ActionEvent evt) {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",

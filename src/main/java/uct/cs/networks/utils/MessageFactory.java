@@ -7,7 +7,7 @@ package uct.cs.networks.utils;
 import java.io.IOException;
 import java.util.List;
 import uct.cs.networks.enums.*;
-import static uct.cs.networks.enums.MessageType.ServerBroadcastUserList;
+import static uct.cs.networks.enums.MessageType.BroadcastUserList;
 import static uct.cs.networks.enums.MessageType.SystemUserAuth;
 import static uct.cs.networks.enums.MessageType.SessionEnd;
 import static uct.cs.networks.enums.MessageType.SessionStart;
@@ -104,7 +104,7 @@ public class MessageFactory {
             case SessionEnd -> {
                 return (SessionEndMessage) message;
             }
-            case ServerBroadcastUserList -> {
+            case BroadcastUserList -> {
                 return (BroadcastSystemUsersMessage) message;
             }
             case SystemUserAuth -> {

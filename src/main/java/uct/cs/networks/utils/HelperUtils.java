@@ -24,6 +24,7 @@ import uct.cs.networks.proto.ProtocolBody;
 public class HelperUtils 
 {    
     private static final String DATETIME_FORMAT = "yyyy.MM.dd.HH.mm.ss";
+    public static final String SERVER_ID = "388f371c-b0d8-4dbc-a36b-0e4303a472d9";
     
     public static String GetCuttentUtcTimestamp()
     {        
