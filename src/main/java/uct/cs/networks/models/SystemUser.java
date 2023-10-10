@@ -21,7 +21,7 @@ public class SystemUser implements Serializable {
     private String _secretKey;
     private String _publicKey; // file path to key
     private byte[] _publicKeyStream = null;
-   
+       
     public SystemUser(SystemUserAuthentication authUser) {
          this(authUser.getId(), authUser.getName(), authUser.getEmailAddress(), authUser.getKeyPassphrase());        
     }
@@ -62,7 +62,7 @@ public class SystemUser implements Serializable {
         return _secretKey;
     }
     
-     public byte[] getPublicKey() {
+    public byte[] getPublicKey() {
         return _publicKeyStream;
     }
 

@@ -19,14 +19,14 @@ import uct.cs.networks.models.SystemUser;
  */
 public class BroadcastSystemUsersMessage extends MessageBase implements IMessage {
 
-    private SystemUser[] _userList; // the new user to be broadcasted
+    private final List<SystemUser> _userList; // the new user to be broadcasted
 
-    public BroadcastSystemUsersMessage(SystemUser sender, List<SystemUser> users) {
-        super(MessageType.ServerBroadcastUserList, sender, null);
-        _userList = (SystemUser[]) users.toArray();
+    public BroadcastSystemUsersMessage(SystemUser sender, SystemUser receiver, List<SystemUser> users) {
+        super(MessageType.ServerBroadcastUserList, sender, receiver);
+        _userList = users;
     }
 
-    public SystemUser[] getUserList() {
+    public List<SystemUser> getUserList() {
         return _userList;
     }
 }

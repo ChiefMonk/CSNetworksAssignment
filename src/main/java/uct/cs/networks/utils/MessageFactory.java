@@ -5,6 +5,7 @@
 package uct.cs.networks.utils;
 
 import java.io.IOException;
+import java.util.List;
 import uct.cs.networks.enums.*;
 import static uct.cs.networks.enums.MessageType.ServerBroadcastUserList;
 import static uct.cs.networks.enums.MessageType.SystemUserAuth;
@@ -23,7 +24,12 @@ import uct.cs.networks.proto.MessageProtocol;
  */
 public class MessageFactory {
 
-    public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String textData, Object data) throws IOException
+    public static MessageProtocol CreateBroadcastSystemUsersMessage(SystemUser sender, SystemUser receiver, List<SystemUser> users) throws IOException
+    {
+           return new MessageProtocol(new BroadcastSystemUsersMessage(sender, receiver, users), false);
+    }
+    
+    public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String textData) throws IOException
     {
        IMessage message = null;
        boolean createHash = true;
@@ -59,12 +65,7 @@ public class MessageFactory {
                 message = new SessionEndMessage(sender, receiver);
                 createHash = false;
                 break;
-            }
-            case ServerBroadcastUserList -> {
-                message = new BroadcastSystemUsersMessage(sender, receiver);
-                createHash = false;
-                break;
-            }
+            }           
             case SystemUserAuth -> {
                 message = new SystemUserAuthenticationMessage(sender);
                 createHash = false;

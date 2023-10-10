@@ -13,9 +13,9 @@ import uct.cs.networks.interfaces.IMessage;
  */
 
 public class ProtocolBody implements Serializable {
-
-    private IMessage _message;
-    private String _messageDigest;   
+   
+    private final IMessage _message;
+    private final String _messageDigest;   
 
     public ProtocolBody(IMessage message, String messageDigest) {
         _message = message;

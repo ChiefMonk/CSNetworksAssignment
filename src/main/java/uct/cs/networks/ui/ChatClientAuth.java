@@ -30,6 +30,10 @@ public class ChatClientAuth extends javax.swing.JDialog {
         TextFieldEmailAddress.setHorizontalAlignment(JTextField.CENTER);
         TextFieldPassphrase.setHorizontalAlignment(JTextField.CENTER);
         setVisible(false);
+        
+        TextFieldChatName.setText("Chipo");
+        TextFieldEmailAddress.setText("chipo@cs");
+        TextFieldPassphrase.setText("chipo001");
     }
 
     /**

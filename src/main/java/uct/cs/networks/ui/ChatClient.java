@@ -51,7 +51,7 @@ public class ChatClient extends javax.swing.JFrame {
     private ObjectOutputStream _outputStream;
     private ObjectInputStream _inputStream;
 
-    private Socket _socket;
+    private Socket _socket;      
 
     /**
      * Creates new form ToolGUI
@@ -79,6 +79,8 @@ public class ChatClient extends javax.swing.JFrame {
         buttonGroup.add(RadioButtonUser4);
         buttonGroup.add(RadioButtonUser5);
         buttonGroup.add(RadioButtonUser6);
+        
+        onLoading();
 
         _messageSentList = new ArrayList<>();
         _messageReceivedList = new ArrayList<>();
@@ -91,6 +93,16 @@ public class ChatClient extends javax.swing.JFrame {
         _fileChooser.setDialogTitle("Select an Image File");
 
         jMenuItem1ActionPerformed(null);               
+    }
+    
+    private void onLoading()
+    {
+        PanelMain.setVisible(false);
+    }
+    
+    private void onSessionStart()
+    {
+        PanelMain.setVisible(true);
     }
 
     /**
@@ -352,7 +364,7 @@ public class ChatClient extends javax.swing.JFrame {
 
         MenuItemServerSettings.setText("File");
 
-        jMenuItem1.setText("Server Settings");
+        jMenuItem1.setText("Server Authentication");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
@@ -550,8 +562,7 @@ public class ChatClient extends javax.swing.JFrame {
             _outputStream = new ObjectOutputStream(_socket.getOutputStream());
             _inputStream = new ObjectInputStream(_socket.getInputStream());
 
-            // _printWriter = new PrintWriter(new
-            // OutputStreamWriter(socket.getOutputStream()), true);
+            onSessionStart();
 
             // Start a new thread for receiving messages
             Thread receiveThread = new Thread(() -> {

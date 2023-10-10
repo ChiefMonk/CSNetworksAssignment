@@ -8,9 +8,13 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import uct.cs.networks.enums.MessageType;
 import uct.cs.networks.interfaces.IMessage;
+import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
+import uct.cs.networks.proto.ProtocolBody;
+import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
 
 /**
@@ -30,9 +34,10 @@ public class ChatServer extends javax.swing.JFrame {
     private static final String ERROR_DEFAULT_TITLE = "Application Error Occurred";
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(20);
     private static final int PORT_NUMBER = 4026;  
+    
+    private SystemUser _serverUser;
     private ServerSocket _serverSocket = null;   
-    private Set<ChatClientHandler> _chatClientList = null;
-    private static int _userCounter = 1;
+    private Set<ChatClientHandler> _chatClientList = null;   
   
     /**
      * Creates new form ToolGUI
@@ -52,6 +57,7 @@ public class ChatServer extends javax.swing.JFrame {
             }
         });
       
+        loadServerUser();
         _chatClientList = new HashSet<>(); 
         _serverSocket = new ServerSocket(PORT_NUMBER);    
     }
@@ -63,6 +69,11 @@ public class ChatServer extends javax.swing.JFrame {
              t = String.format("%s : Listening on %s:%s",  TITLE,ipAddress, PORT_NUMBER);
         
         this.setTitle("<html><body><center>" + t + "</center></body></html>");
+    }
+    
+    private void loadServerUser()
+    {
+        _serverUser = new SystemUser("388f371c-b0d8-4dbc-a36b-0e4303a472d9", "The Server", "chatserver@cs.uct.ac.za", "chatserver001");
     }
     
     private String getIpAddress()
@@ -218,6 +229,56 @@ public class ChatServer extends javax.swing.JFrame {
             client.sendMessage(message);      
         }            
     }
+    
+    private void processReceivedMessage(ChatClientHandler client, Object messageObject) 
+    {   
+        if(messageObject == null)
+            return;
+         
+        try
+        {                 
+            MessageProtocol message = MessageFactory.getMessage(messageObject);
+            appendInMessage(" =>:" + message.toServerString());
+            
+            // Message if for the server
+            if(message.getType() == MessageType.SystemUserAuth)
+            {
+                var cipherBody = message.getCipherBody().toString();
+                // decrypt
+                var plainBody = cipherBody;
+                       
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+            
+                var actualMessage = (SystemUserAuthenticationMessage)messageBody.getMessage();                
+                client.setSystemUser(actualMessage.getUser());    
+                
+                MessageProtocol outMessage = MessageFactory.CreateBroadcastSystemUsersMessage(_serverUser, client.getSystemUser(), getAllSystemUsers());
+                broadcastMessage(outMessage);
+            }
+            else
+            {
+                broadcastMessage(message);     
+            }                                                   
+        }
+        catch (IOException | ClassNotFoundException ex) 
+        {
+             logException(ex);
+        }                        
+    }
+    
+    private List<SystemUser> getAllSystemUsers()
+    {
+        List<SystemUser> users = new ArrayList<>();
+        
+        users.add(_serverUser);
+        
+        for (ChatClientHandler client : _chatClientList) 
+        {
+            users.add(client.getSystemUser());      
+        } 
+        
+        return users;
+    }
             
     private void closeServerSocket()
     {
@@ -256,10 +317,9 @@ public class ChatServer extends javax.swing.JFrame {
             _secureSocket = secureSocket;
             
             try
-            {
+            {               
                 _inputStream = new ObjectInputStream(_secureSocket.getInputStream());       
-                _outputStream = new ObjectOutputStream (_secureSocket.getOutputStream());
-                createSystemUser();
+                _outputStream = new ObjectOutputStream (_secureSocket.getOutputStream());                     
             }
             catch(IOException ex)
             {
@@ -272,11 +332,9 @@ public class ChatServer extends javax.swing.JFrame {
         {            
             try
             {
-                Object object;
-                while ((object = _inputStream.readObject()) != null) {
-                    MessageProtocol message = MessageFactory.getMessage(object);
-                    appendInMessage(" =>:" + message.toServerString());
-                    broadcastMessage(message);
+                Object messageObject;
+                while ((messageObject = _inputStream.readObject()) != null) {
+                    processReceivedMessage(this, messageObject);                   
                 }
             }
             catch (IOException | ClassNotFoundException ex) 
@@ -285,8 +343,8 @@ public class ChatServer extends javax.swing.JFrame {
             }
             finally
             {
-                removeClient();
-                closeSocket();
+                //removeClient();
+                //closeSocket();
             }
         }
         
@@ -300,6 +358,16 @@ public class ChatServer extends javax.swing.JFrame {
             {
                 logException(ex);
             }              
+        }
+        
+        public void setSystemUser(SystemUser systemUser)
+        {
+            _systemUser = systemUser;
+        }
+        
+        public SystemUser getSystemUser()
+        {
+            return _systemUser;
         }
                
         private void removeClient()
@@ -317,13 +385,7 @@ public class ChatServer extends javax.swing.JFrame {
             {
                 logException(ex);
             }
-        }
-        
-    
-        private void createSystemUser()
-        {
-            _systemUser = new SystemUser(java.util.UUID.randomUUID().toString(), "User " + _userCounter, "User" + _userCounter+"@mail.co.za", "User " + _userCounter);
-        }
+        }        
     }
     
      private void ButtonExitApplicationActionPerformed() 
