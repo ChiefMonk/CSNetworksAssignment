@@ -1,6 +1,8 @@
 package uct.cs.networks.models;
 
 import java.io.FileInputStream;
+import java.io.Serializable;
+import org.apache.commons.io.IOUtils;
 
 import uct.cs.networks.utils.*;
 
@@ -12,13 +14,13 @@ import uct.cs.networks.utils.*;
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
 
-public class SystemUser {
+public class SystemUser implements Serializable {
     private final String _id;
     private final String _name;
     private final String _emailAddress;   
     private String _secretKey;
     private String _publicKey; // file path to key
-    private FileInputStream _publicKeyStream = null;
+    private byte[] _publicKeyStream = null;
    
     public SystemUser(SystemUserAuthentication authUser) {
          this(authUser.getId(), authUser.getName(), authUser.getEmailAddress(), authUser.getKeyPassphrase());        
@@ -36,7 +38,7 @@ public class SystemUser {
         setPublicKey();
     }
     
-    public SystemUser (String id, String name, String emailAddress, FileInputStream publicKeyStream)
+    public SystemUser (String id, String name, String emailAddress, byte[] publicKeyStream)
     {
         _id = id;
         _name = name;
@@ -60,14 +62,14 @@ public class SystemUser {
         return _secretKey;
     }
     
-     public FileInputStream getPublicKey() {
+     public byte[] getPublicKey() {
         return _publicKeyStream;
     }
 
     private void setPublicKey() 
     {      
         try {
-            _publicKeyStream = new FileInputStream(_publicKey);
+          _publicKeyStream = IOUtils.toByteArray(new FileInputStream(_publicKey));
         } catch (Exception e) {
             e.printStackTrace();
         }      

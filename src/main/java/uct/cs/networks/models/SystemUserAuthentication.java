@@ -1,5 +1,7 @@
 package uct.cs.networks.models;
 
+import java.io.Serializable;
+
 
 /**
  *
@@ -9,7 +11,7 @@ package uct.cs.networks.models;
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
 
-public class SystemUserAuthentication {
+public class SystemUserAuthentication implements Serializable {
     private final String _serverIpAddress;
     private final int _portNumber;
     private final String _id;

@@ -71,12 +71,16 @@ public class PgpEncryptionUtil {
         cipherOutStream.close();
         encryptOut.close();
     }
-
+    
     public byte[] encrypt(byte[] clearData, InputStream pubicKeyIn) throws PGPException, IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(clearData);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         encrypt(outputStream, inputStream, clearData.length, pubicKeyIn);
         return outputStream.toByteArray();
+    }
+
+    public byte[] encrypt(byte[] clearData,  byte[] pubicKeyIn) throws PGPException, IOException {       
+       return  encrypt(clearData,  new ByteArrayInputStream(pubicKeyIn));       
     }
 
     public InputStream encrypt(InputStream clearIn, long length, InputStream publicKeyIn)
