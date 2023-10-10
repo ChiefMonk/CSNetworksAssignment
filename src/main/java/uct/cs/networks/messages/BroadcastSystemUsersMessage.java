@@ -5,6 +5,7 @@ package uct.cs.networks.messages;
             Should add user object to userList of each client and update GUI to show user
  */
 
+import java.util.List;
 import uct.cs.networks.enums.MessageType;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.models.SystemUser;
@@ -18,18 +19,14 @@ import uct.cs.networks.models.SystemUser;
  */
 public class BroadcastSystemUsersMessage extends MessageBase implements IMessage {
 
-    private SystemUser user; // the new user to be broadcasted
+    private SystemUser[] _userList; // the new user to be broadcasted
 
-    public BroadcastSystemUsersMessage(SystemUser sender, SystemUser receiver) {
-        super(MessageType.ServerBroadcastUserList, sender, receiver);
-        user = sender;
+    public BroadcastSystemUsersMessage(SystemUser sender, List<SystemUser> users) {
+        super(MessageType.ServerBroadcastUserList, sender, null);
+        _userList = (SystemUser[]) users.toArray();
     }
 
-    public SystemUser getUser() {
-        return user;
-    }
-
-    public void setUser(SystemUser user) {
-        this.user = user;
+    public SystemUser[] getUserList() {
+        return _userList;
     }
 }

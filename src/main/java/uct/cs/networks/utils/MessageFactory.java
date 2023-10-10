@@ -23,7 +23,7 @@ import uct.cs.networks.proto.MessageProtocol;
  */
 public class MessageFactory {
 
-    public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String textData) throws IOException
+    public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String textData, Object data) throws IOException
     {
        IMessage message = null;
        boolean createHash = true;

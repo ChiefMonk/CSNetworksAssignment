@@ -14,14 +14,20 @@ import uct.cs.networks.models.SystemUser;
 public abstract class MessageBase implements Serializable {
     private final String _id;   
     private final MessageType _type;    
-    private final String _sender; 
-    private final String _receiver;
+    private String _sender; 
+    private String _receiver;
 
     public MessageBase(MessageType type, SystemUser sender, SystemUser receiver) {
         _id = java.util.UUID.randomUUID().toString();
         _type =  type;
-        _sender = sender.getId();       
-        _receiver = receiver.getId();        
+        _sender = "";
+        _receiver = "";
+   
+        if(sender != null)
+            _sender = sender.getId();   
+   
+        if(receiver != null)
+            _receiver = receiver.getId();        
     }
     
     public MessageBase(MessageType type, SystemUser sender) {
