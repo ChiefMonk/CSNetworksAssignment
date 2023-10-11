@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Image;
 import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -19,21 +18,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import uct.cs.networks.enums.*;
 import uct.cs.networks.messages.*;
-import uct.cs.networks.models.SystemUser;
-import uct.cs.networks.proto.MessageProtocol;
-import uct.cs.networks.proto.ProtocolBody;
-import uct.cs.networks.utils.CompressionHelper;
-import uct.cs.networks.utils.HelperUtils;
-import uct.cs.networks.utils.MessageFactory;
-import uct.cs.networks.utils.CompressionHelper;
-import uct.cs.networks.utils.AESEncryption;
-import uct.cs.networks.utils.EncryptionHelper;
-import uct.cs.networks.utils.HelperUtils;
-import uct.cs.networks.utils.MessageFactory;
-
+import uct.cs.networks.models.*;
+import uct.cs.networks.proto.*;
+import uct.cs.networks.utils.*;
 /**
  * The ChatClient is the main class for the Desktop Application.
  * 

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package uct.cs.networks.utils;
 
 import java.io.IOException;
@@ -20,8 +16,15 @@ import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
 
 /**
- *
- * @author Chipo Hamayobe (chipo@cs.uct.ac.za)
+ * The MessageFactory Class.
+ * 
+ * @author Shaylin Chetty (CHTSHA042@myuct.ac.za)
+ * @author Chipo Hamayobe (HMYCHI001@myuct.ac.za)
+ * @author Orefile Morule (MRLORE001@myuct.ac.za)
+ * @author Enock Shezi (SHZENO001@myuct.ac.za)
+ * 
+ * @version 1.0.1
+ * @since 2023-09-21
  */
 public class MessageFactory {
 
