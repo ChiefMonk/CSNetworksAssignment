@@ -5,6 +5,7 @@
 package uct.cs.networks.utils;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.List;
 import uct.cs.networks.enums.*;
 import static uct.cs.networks.enums.MessageType.BroadcastUserList;
@@ -24,29 +25,41 @@ import uct.cs.networks.proto.MessageProtocol;
  */
 public class MessageFactory {
 
-    public static MessageProtocol CreateBroadcastSystemUsersMessage(SystemUser sender, SystemUser receiver, List<SystemUser> users) throws IOException
-    {
-           return new MessageProtocol(new BroadcastSystemUsersMessage(sender, receiver, users), false);
+    public static MessageProtocol CreateBroadcastSystemUsersMessage(SystemUser sender, SystemUser receiver,
+            List<SystemUser> users) throws IOException {
+        return new MessageProtocol(new BroadcastSystemUsersMessage(sender, receiver, users), false, null);
     }
-    
-    public static MessageProtocol CreateValidateCertMessageResponse(SystemUser sender, SystemUser receiver, SystemUser verifyUser, CertificateVerificationResult verificationResult) throws IOException
-    {
-           return new MessageProtocol(new ValidateCertMessageResponse(sender, receiver, verifyUser, verificationResult), false);
+
+    public static MessageProtocol CreateValidateCertMessageResponse(SystemUser sender, SystemUser receiver,
+            SystemUser verifyUser, CertificateVerificationResult verificationResult) throws IOException {
+        return new MessageProtocol(new ValidateCertMessageResponse(sender, receiver, verifyUser, verificationResult),
+                false, null);
     }
-    
-    public static MessageProtocol CreateValidateCertMessageRequest(SystemUser sender, SystemUser receiver, SystemUser verifyUser) throws IOException
-    {
-           return new MessageProtocol(new ValidateCertMessageRequest(sender, receiver, verifyUser), false);
+
+    public static MessageProtocol CreateValidateCertMessageRequest(SystemUser sender, SystemUser receiver,
+            SystemUser verifyUser) throws IOException {
+        return new MessageProtocol(new ValidateCertMessageRequest(sender, receiver, verifyUser), false, null);
     }
-    
-    public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type, byte[] imageData, String textData) throws IOException
-    {
-       IMessage message = null;
-       boolean createHash = true;
+
+    private static Key createSharedKey() {
+        AESEncryption aesEncryption = new AESEncryption();
+        Key key = null;
+        try {
+            key = aesEncryption.getKeyFromKeyGenerator();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return key;
+    }
+
+    public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type,
+            byte[] imageData, String textData) throws IOException {
+        IMessage message = null;
+        boolean createHash = true;
         switch (type) {
             case SendText -> {
-                
-                message =  new SendTextMessage(sender, receiver, textData);
+
+                message = new SendTextMessage(sender, receiver, textData);
                 break;
             }
 
@@ -54,9 +67,9 @@ public class MessageFactory {
                 message = new SendImageWithTextMessage(sender, receiver, imageData, textData);
                 break;
             }
-            
+
             case SessionStart -> {
-                message = new SessionStartMessage(sender, receiver);
+                message = new SessionStartMessage(sender, receiver, createSharedKey());
                 createHash = false;
                 break;
             }
@@ -65,7 +78,7 @@ public class MessageFactory {
                 message = new SessionEndMessage(sender, receiver);
                 createHash = false;
                 break;
-            }           
+            }
             case SystemUserAuth -> {
                 message = new SystemUserAuthenticationMessage(sender);
                 createHash = false;
@@ -73,19 +86,17 @@ public class MessageFactory {
             }
         }
 
-        if(message != null)
-            return new MessageProtocol(message, createHash);
-        
+        if (message != null)
+            return new MessageProtocol(message, createHash, receiver);
+
         return null;
     }
-    
-    public static MessageProtocol getMessage(Object obj) throws IOException, ClassNotFoundException 
-    {
-      return (MessageProtocol) obj;      
+
+    public static MessageProtocol getMessage(Object obj) throws IOException, ClassNotFoundException {
+        return (MessageProtocol) obj;
     }
 
-    private static IMessage getMessage2(Object obj) throws IOException, ClassNotFoundException 
-    {
+    private static IMessage getMessage2(Object obj) throws IOException, ClassNotFoundException {
         IMessage message = (IMessage) obj;
 
         switch (message.getType()) {

@@ -19,12 +19,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import uct.cs.networks.enums.*;
 import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
 import uct.cs.networks.utils.CompressionHelper;
+import uct.cs.networks.utils.HelperUtils;
+import uct.cs.networks.utils.MessageFactory;
+import uct.cs.networks.utils.CompressionHelper;
+import uct.cs.networks.utils.AESEncryption;
 import uct.cs.networks.utils.EncryptionHelper;
 import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
@@ -47,20 +52,23 @@ public class ChatClient extends javax.swing.JFrame {
     private static final String ERROR_DEFAULT_TITLE = "Invalid Error Occurred";
 
     private final JFileChooser _fileChooser;
-    
+
     private String _ipAddress = "127.0.0.1";
     private int _portNumber = 4026;
 
+    private String _passPhrase;
+
     private SystemUser _currentUser;
     private Map<Integer, SystemUser> _listOfUsers;
-    
+
     private List<String> _sendMessageIdList;
-    private List<String> _receivedMessageIdList;   
+    private List<String> _receivedMessageIdList;
 
     private ObjectOutputStream _outputStream;
     private ObjectInputStream _inputStream;
 
     private Socket _secureSocket;      
+
 
     /**
      * Creates new form ToolGUI
@@ -68,7 +76,7 @@ public class ChatClient extends javax.swing.JFrame {
     public ChatClient() {
         super(TITLE);
         initComponents();
-        this.setResizable(true);       
+        this.setResizable(true);
         this.setVisible(true);
         this.setTitle("<html><body><center>" + TITLE + "</center></body></html>");
 
@@ -88,12 +96,12 @@ public class ChatClient extends javax.swing.JFrame {
         buttonGroup.add(RadioUser3);
         buttonGroup.add(RadioUser4);
         buttonGroup.add(RadioUser5);
-        
+
         onLoading();
-       
+
         _sendMessageIdList = new ArrayList<>();
         _receivedMessageIdList = new ArrayList<>();
-       
+
         _listOfUsers = new HashMap<Integer, SystemUser>();
 
         _fileChooser = new JFileChooser();
@@ -102,17 +110,15 @@ public class ChatClient extends javax.swing.JFrame {
         _fileChooser.setDialogTitle("Select an Image File");
 
         ComboBoxMessageTypeActionPerformed(null);
-        jMenuItem1ActionPerformed(null);               
+        jMenuItem1ActionPerformed(null);
     }
-    
-    private void onLoading()
-    {
+
+    private void onLoading() {
         PanelMain.setVisible(false);
         processUserList(null);
     }
-    
-    private void onSessionStart()
-    {
+
+    private void onSessionStart() {
         PanelMain.setVisible(true);
     }
 
@@ -123,7 +129,8 @@ public class ChatClient extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -157,13 +164,11 @@ public class ChatClient extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE));
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -197,41 +202,39 @@ public class ChatClient extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
-                    .addComponent(RadioUserServer)
-                    .addComponent(RadioUser1)
-                    .addComponent(RadioUser2)
-                    .addComponent(RadioUser3)
-                    .addComponent(RadioUser4)
-                    .addComponent(RadioUser5))
-                .addGap(31, 31, 31)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel9)
+                                        .addComponent(RadioUserServer)
+                                        .addComponent(RadioUser1)
+                                        .addComponent(RadioUser2)
+                                        .addComponent(RadioUser3)
+                                        .addComponent(RadioUser4)
+                                        .addComponent(RadioUser5))
+                                .addGap(31, 31, 31)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
+                                .addContainerGap()));
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioUserServer)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioUser1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioUser2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioUser3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioUser4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioUser5)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-        );
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(RadioUserServer)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(RadioUser1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(RadioUser2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(RadioUser3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(RadioUser4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(RadioUser5)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE));
 
         ButtonLoadImage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         ButtonLoadImage.setText("Load Image");
@@ -244,32 +247,40 @@ public class ChatClient extends javax.swing.JFrame {
         javax.swing.GroupLayout PanelInputsLayout = new javax.swing.GroupLayout(PanelInputs);
         PanelInputs.setLayout(PanelInputsLayout);
         PanelInputsLayout.setHorizontalGroup(
-            PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelInputsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelInputsLayout.createSequentialGroup()
-                        .addComponent(ButtonLoadImage, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(49, 49, 49)))
-                .addContainerGap())
-        );
+                PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelInputsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(PanelInputsLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 281,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelInputsLayout
+                                                .createSequentialGroup()
+                                                .addComponent(ButtonLoadImage, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(49, 49, 49)))
+                                .addContainerGap()));
         PanelInputsLayout.setVerticalGroup(
-            PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelInputsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(PanelInputsLayout.createSequentialGroup()
-                        .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(ButtonLoadImage))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
+                PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelInputsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(
+                                        PanelInputsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(PanelInputsLayout.createSequentialGroup()
+                                                        .addComponent(Labelmage, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(18, 18, 18)
+                                                        .addComponent(ButtonLoadImage))
+                                                .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap()));
 
-        PanelOutputEntailAndJustify.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
+        PanelOutputEntailAndJustify
+                .setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
 
         textFieldInputMessage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
@@ -281,41 +292,50 @@ public class ChatClient extends javax.swing.JFrame {
             }
         });
 
-        ComboBoxMessageType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1. Session Start Message", "2. Verify Public Certificate", "3. Send Text Message", "4. Send Image with Caption Message", "5. Session End Message" }));
+        ComboBoxMessageType.setModel(new javax.swing.DefaultComboBoxModel<>(
+                new String[] { "1. Session Start Message", "2. Verify Public Certificate", "3. Send Text Message",
+                        "4. Send Image with Caption Message", "5. Session End Message" }));
         ComboBoxMessageType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ComboBoxMessageTypeActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout PanelOutputEntailAndJustifyLayout = new javax.swing.GroupLayout(PanelOutputEntailAndJustify);
+        javax.swing.GroupLayout PanelOutputEntailAndJustifyLayout = new javax.swing.GroupLayout(
+                PanelOutputEntailAndJustify);
         PanelOutputEntailAndJustify.setLayout(PanelOutputEntailAndJustifyLayout);
         PanelOutputEntailAndJustifyLayout.setHorizontalGroup(
-            PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(textFieldInputMessage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ButtonSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+                PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(textFieldInputMessage)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(ButtonSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 159,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap()));
         PanelOutputEntailAndJustifyLayout.setVerticalGroup(
-            PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelOutputEntailAndJustifyLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15))
-            .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(ButtonSendMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(textFieldInputMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
-                .addContainerGap(8, Short.MAX_VALUE))
-        );
+                PanelOutputEntailAndJustifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                PanelOutputEntailAndJustifyLayout.createSequentialGroup()
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(ComboBoxMessageType, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(15, 15, 15))
+                        .addGroup(PanelOutputEntailAndJustifyLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(PanelOutputEntailAndJustifyLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(ButtonSendMessage, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(textFieldInputMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 42,
+                                                Short.MAX_VALUE))
+                                .addContainerGap(8, Short.MAX_VALUE)));
 
-        PanelOutputExplanations.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
+        PanelOutputExplanations
+                .setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
 
         textAreaOutputLogs.setEditable(false);
         textAreaOutputLogs.setColumns(20);
@@ -329,49 +349,52 @@ public class ChatClient extends javax.swing.JFrame {
         javax.swing.GroupLayout PanelOutputExplanationsLayout = new javax.swing.GroupLayout(PanelOutputExplanations);
         PanelOutputExplanations.setLayout(PanelOutputExplanationsLayout);
         PanelOutputExplanationsLayout.setHorizontalGroup(
-            PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane7)
-                    .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
+                PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(PanelOutputExplanationsLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane7)
+                                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                                                .addComponent(jLabel8)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap()));
         PanelOutputExplanationsLayout.setVerticalGroup(
-            PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                                .addContainerGap()));
 
         javax.swing.GroupLayout PanelMainLayout = new javax.swing.GroupLayout(PanelMain);
         PanelMain.setLayout(PanelMainLayout);
         PanelMainLayout.setHorizontalGroup(
-            PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelMainLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(PanelInputs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
+                PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelMainLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(PanelInputs, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap()));
         PanelMainLayout.setVerticalGroup(
-            PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelMainLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(PanelInputs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelMainLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(PanelInputs, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(PanelOutputEntailAndJustify, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap()));
 
         MenuItemServerSettings.setText("File");
 
@@ -393,410 +416,395 @@ public class ChatClient extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(PanelMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(PanelMain, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void sendMessage(MessageProtocol message)                        
-    {
-       try 
-       {           
+    private SystemUser findByID(String id) {
+        for (SystemUser user : _listOfUsers.values()) {
+            if (user.getId().equals(id)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private void sendMessage(MessageProtocol message) {
+        try {
             if (message == null)
                 return;  
             
             var compressMessage = CompressionHelper.compressMessage(message);
             
-            _outputStream.writeObject(compressMessage);
+            _outputStream.writeObject(compressMessage);    
             _outputStream.flush();
-            
-            _sendMessageIdList.add(message.getId());           
-        } 
-        catch (IOException ex) 
-        {
+
+            _sendMessageIdList.add(message.getId());
+        } catch (IOException ex) {
             ex.printStackTrace();
-        } 
-    }
-    
-    private void processReceivedMessage(MessageProtocol messageObject) {       
-       
-        if(messageObject == null)
-            return;
-         
-        if(_receivedMessageIdList == null || _receivedMessageIdList.isEmpty())
-                _receivedMessageIdList = new ArrayList<>();
-        
-        try
-        {                 
-            MessageProtocol message = MessageFactory.getMessage(messageObject);  
-            appendTextAreaOutputLogs(message);               
-            
-            _receivedMessageIdList.add(message.getId());            
-            var cipherBody = message.getCipherBody().toString();
-            
-            // Message if for the server
-            if(message.getType() == MessageType.BroadcastUserList)
-            {              
-                // decrypt
-                var plainBody = cipherBody;                       
-                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
-                var actualMessage = (BroadcastSystemUsersMessage)messageBody.getMessage(); 
-                
-               // if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-               //     return;
-                   
-                appendTextAreaLive(actualMessage);                  
-                processUserList(actualMessage.getUserList());               
-            }
-            
-            if(message.getType() == MessageType.SessionStart)
-            {
-              // decrypt
-                var plainBody = cipherBody;                       
-                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
-                var actualMessage = (SessionStartMessage)messageBody.getMessage();   
-                    
-                 
-                // if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                //    return;
-                
-                appendTextAreaLive(actualMessage);   
-            }
-            
-            if(message.getType() == MessageType.SessionEnd)
-            {
-              // decrypt
-                var plainBody = cipherBody;                       
-                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
-                var actualMessage = (SessionEndMessage)messageBody.getMessage();   
-                
-               //  if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                //    return;
-                
-                appendTextAreaLive(actualMessage);   
-            }
-            
-            if(message.getType() == MessageType.ValidateCertResponse)
-            {
-              // decrypt
-                var plainBody = cipherBody;                       
-                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
-                var actualMessage = (ValidateCertMessageResponse)messageBody.getMessage();   
-                
-                // if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                //    return;
-                
-                appendTextAreaLive(actualMessage);   
-            }
-            
-            if(message.getType() == MessageType.SendText)
-            {
-              // decrypt
-                var plainBody = cipherBody;                       
-                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
-                var actualMessage = (SendTextMessage)messageBody.getMessage();  
-                
-                //if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                 //   return;
-                 
-                appendTextAreaLive(actualMessage);   
-            }
-            
-            if(message.getType() == MessageType.SendImageWithText)
-            {
-              // decrypt
-                var plainBody = cipherBody;                       
-                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);            
-                var actualMessage = (SendImageWithTextMessage)messageBody.getMessage();   
-                
-                 //if(!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest()))
-                   // return;
-                   
-                appendTextAreaLive(actualMessage);   
-                setImageIconToLabel(byteArrayToImageIcon(actualMessage.getImageData()));      
-            }
         }
-        catch (IOException | ClassNotFoundException ex) 
-        {
-             logException(ex);
-        }                 
     }
-    
-    private boolean validateHashAgainstMessage(IMessage message, String hashDigest)
-    {
-        if(hashDigest == null || hashDigest.isBlank())
+
+    private void processReceivedMessage(MessageProtocol messageObject) {
+
+        if (messageObject == null)
+            return;
+
+        if (_receivedMessageIdList == null || _receivedMessageIdList.isEmpty())
+            _receivedMessageIdList = new ArrayList<>();
+
+        try {
+            MessageProtocol message = MessageFactory.getMessage(messageObject);
+            appendTextAreaOutputLogs(message);
+
+            _receivedMessageIdList.add(message.getId());
+            var cipherBody = message.getCipherBody().toString();
+
+            // Message if for the server
+            if (message.getType() == MessageType.BroadcastUserList) {
+                // decrypt
+                var plainBody = cipherBody;
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                var actualMessage = (BroadcastSystemUsersMessage) messageBody.getMessage();
+
+                // if(!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest()))
+                // return;
+
+                appendTextAreaLive(actualMessage);
+                processUserList(actualMessage.getUserList());
+            }
+
+            if (message.getType() == MessageType.SessionStart) {
+                cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser, _passPhrase); // decrypt
+                var plainBody = cipherBody;
+                MessageProtocol messageProtocol = (MessageProtocol) HelperUtils
+                        .convertBase64StringToMessageProtocol(plainBody);
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                var actualMessage = (SessionStartMessage) messageBody.getMessage();
+
+                // if(!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest()))
+                // return;
+
+                appendTextAreaLive(actualMessage);
+                // Add session key to user in userList
+                AESEncryption aesEncryption = new AESEncryption();
+                String key = null;
+                try {
+                    key = aesEncryption.serializeKeyToString(actualMessage.getSessionKey()); // add session key from
+                                                                                             // actual message
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                findByID(messageProtocol.getSender()).setSecretKey(key); // Find user
+
+            }
+
+            if (message.getType() == MessageType.SessionEnd) {
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
+                var plainBody = cipherBody;
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                var actualMessage = (SessionEndMessage) messageBody.getMessage();
+
+                // if(!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest()))
+                // return;
+
+                appendTextAreaLive(actualMessage);
+            }
+
+            if (message.getType() == MessageType.ValidateCertResponse) {
+                // decrypt
+                var plainBody = cipherBody;
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                var actualMessage = (ValidateCertMessageResponse) messageBody.getMessage();
+
+                // if(!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest()))
+                // return;
+
+                appendTextAreaLive(actualMessage);
+            }
+
+            if (message.getType() == MessageType.SendText) {
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
+                var plainBody = cipherBody;
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                var actualMessage = (SendTextMessage) messageBody.getMessage();
+
+                // if(!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest()))
+                // return;
+
+                appendTextAreaLive(actualMessage);
+            }
+
+            if (message.getType() == MessageType.SendImageWithText) {
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
+                var plainBody = cipherBody;
+                ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                var actualMessage = (SendImageWithTextMessage) messageBody.getMessage();
+
+                // if(!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest()))
+                // return;
+
+                appendTextAreaLive(actualMessage);
+                setImageIconToLabel(byteArrayToImageIcon(actualMessage.getImageData()));
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            logException(ex);
+        }
+    }
+
+    private boolean validateHashAgainstMessage(IMessage message, String hashDigest) {
+        if (hashDigest == null || hashDigest.isBlank())
             return true;
-        
+
         return (EncryptionHelper.createMessageDigest(message).equals(hashDigest));
     }
-    
-    private void processUserList(List<SystemUser> userList)
-    {
+
+    private void processUserList(List<SystemUser> userList) {
         RadioUserServer.setVisible(false);
         RadioUser1.setVisible(false);
         RadioUser2.setVisible(false);
         RadioUser3.setVisible(false);
         RadioUser4.setVisible(false);
         RadioUser5.setVisible(false);
-        
-        boolean radioUser2Set =  false;
-        boolean radioUser3Set =  false;
-        boolean radioUser4Set =  false;
-        boolean radioUser5Set =  false;
-        
-       _listOfUsers = new HashMap<Integer, SystemUser>();
-        
-       if(userList == null ||userList.isEmpty())
-           return;
-                  
-       for(SystemUser user : userList)
-       { 
-           if(user.getId().equals(HelperUtils.SERVER_ID))
-           {
-               RadioUserServer.setVisible(true);
-               RadioUserServer.setText(user.getName());
-               _listOfUsers.put(0, user);
-               continue;
-           }
-           
-           if(user.getId().equals(_currentUser.getId()))
-           {
-               RadioUser1.setVisible(true);
-               RadioUser1.setText(String.format("%s (you)", user.getName()));
-               _listOfUsers.put(1, user);
-               continue;
-           }
-           
-           if(!radioUser2Set)
-           {
-               RadioUser2.setVisible(true);
-               RadioUser2.setText(user.getName()); 
-               radioUser2Set = true;
+
+        boolean radioUser2Set = false;
+        boolean radioUser3Set = false;
+        boolean radioUser4Set = false;
+        boolean radioUser5Set = false;
+
+        _listOfUsers = new HashMap<Integer, SystemUser>();
+
+        if (userList == null || userList.isEmpty())
+            return;
+
+        for (SystemUser user : userList) {
+            if (user.getId().equals(HelperUtils.SERVER_ID)) {
+                RadioUserServer.setVisible(true);
+                RadioUserServer.setText(user.getName());
+                _listOfUsers.put(0, user);
+                continue;
+            }
+
+            if (user.getId().equals(_currentUser.getId())) {
+                RadioUser1.setVisible(true);
+                RadioUser1.setText(String.format("%s (you)", user.getName()));
+                _listOfUsers.put(1, user);
+                continue;
+            }
+
+            if (!radioUser2Set) {
+                RadioUser2.setVisible(true);
+                RadioUser2.setText(user.getName());
+                radioUser2Set = true;
                 _listOfUsers.put(2, user);
-               continue;
-           }
-           
-           if(!radioUser3Set)
-           {
-               RadioUser3.setVisible(true);
-               RadioUser3.setText(user.getName()); 
-               radioUser3Set = true;
+                continue;
+            }
+
+            if (!radioUser3Set) {
+                RadioUser3.setVisible(true);
+                RadioUser3.setText(user.getName());
+                radioUser3Set = true;
                 _listOfUsers.put(3, user);
-               continue;
-           }
-            
-           if(!radioUser4Set)
-           {
-               RadioUser4.setVisible(true);
-               RadioUser4.setText(user.getName()); 
-               radioUser4Set = true;
+                continue;
+            }
+
+            if (!radioUser4Set) {
+                RadioUser4.setVisible(true);
+                RadioUser4.setText(user.getName());
+                radioUser4Set = true;
                 _listOfUsers.put(4, user);
-               continue;
-           }
-             
-           if(!radioUser5Set)
-           {
-               RadioUser5.setVisible(true);
-               RadioUser5.setText(user.getName()); 
-               radioUser5Set = true;
+                continue;
+            }
+
+            if (!radioUser5Set) {
+                RadioUser5.setVisible(true);
+                RadioUser5.setText(user.getName());
+                radioUser5Set = true;
                 _listOfUsers.put(5, user);
-               continue;
-           }                     
-       } 
-       
-       RadioUserServer.setSelected(true);
+                continue;
+            }
+        }
+
+        RadioUserServer.setSelected(true);
     }
-    
-    private SystemUser getSelectedUser()
-    {
-        if(RadioUserServer.isSelected())
+
+    private SystemUser getSelectedUser() {
+        if (RadioUserServer.isSelected())
             return _listOfUsers.get(0);
-        
-        if(RadioUser1.isSelected())
+
+        if (RadioUser1.isSelected())
             return _listOfUsers.get(1);
-         
-        if(RadioUser2.isSelected())
+
+        if (RadioUser2.isSelected())
             return _listOfUsers.get(2);
-          
-       if(RadioUser3.isSelected())
+
+        if (RadioUser3.isSelected())
             return _listOfUsers.get(3);
-           
-        if(RadioUser4.isSelected())
+
+        if (RadioUser4.isSelected())
             return _listOfUsers.get(4);
-            
-        if(RadioUser5.isSelected())
+
+        if (RadioUser5.isSelected())
             return _listOfUsers.get(5);
-             
+
         return null;
     }
-     
-    private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+
+    // Send Messages
+    private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {
 
         String errorTitle = "Message Type Error";
-        
+
         var messageType = getMessageType(String.valueOf(ComboBoxMessageType.getSelectedItem()));
         MessageProtocol message = null;
         var receiver = getSelectedUser();
-        
-        if (receiver == null || RadioUser1.isSelected())
-        {
+
+        if (receiver == null || RadioUser1.isSelected()) {
             showErrorPopupMessage(errorTitle, "Please select a valid user to send the message to. Not yourself");
             return;
         }
-        
-        if(messageType == MessageType.ValidateCertRequest)
-        {
-            if(!RadioUserServer.isSelected())
-            {
+
+        if (messageType == MessageType.ValidateCertRequest) {
+            if (!RadioUserServer.isSelected()) {
                 showErrorPopupMessage(errorTitle, "Please select a 'The Server' for such type of message");
                 return;
             }
-        }
-        else
-        {
-            if(RadioUserServer.isSelected() || RadioUser1.isSelected())
-            {
-                showErrorPopupMessage(errorTitle, "Please select a valid user to send the message to. Not the server or yourself");
+        } else {
+            if (RadioUserServer.isSelected() || RadioUser1.isSelected()) {
+                showErrorPopupMessage(errorTitle,
+                        "Please select a valid user to send the message to. Not the server or yourself");
                 return;
             }
         }
-        
-        try 
-        {        
-            // Message if for the server            
-            if(messageType == MessageType.SessionStart)
-            {                 
+
+        try {
+            // Message if for the server
+            if (messageType == MessageType.SessionStart) {
                 message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);
-            } 
-            
-            if(messageType == MessageType.SessionEnd)
-            {
-               message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);         
             }
-            
-            if(messageType == MessageType.ValidateCertRequest)
-            {
-              message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);         
-            }            
-            if(messageType == MessageType.SendText || messageType == MessageType.SendImageWithText)
-            {
+
+            if (messageType == MessageType.SessionEnd) {
+                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);
+            }
+
+            if (messageType == MessageType.ValidateCertRequest) {
+                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);
+            }
+            if (messageType == MessageType.SendText || messageType == MessageType.SendImageWithText) {
                 String textData = textFieldInputMessage.getText();
-                 
-                if (textData == null || textData.isBlank())
-                {
+
+                if (textData == null || textData.isBlank()) {
                     showErrorPopupMessage(errorTitle, "Please enter the Text Message to send to the selected user");
                     return;
                 }
-                 
-                if(messageType == MessageType.SendText)
-                {
-                    message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, textData);
-                } 
 
-                if(messageType == MessageType.SendImageWithText)
-                {
-                    if(!_fileChooser.isFileSelectionEnabled() || _fileChooser.getSelectedFile() == null || !_fileChooser.getSelectedFile().isFile())
-                    {
+                if (messageType == MessageType.SendText) {
+                    message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, textData);
+                }
+
+                if (messageType == MessageType.SendImageWithText) {
+                    if (!_fileChooser.isFileSelectionEnabled() || _fileChooser.getSelectedFile() == null
+                            || !_fileChooser.getSelectedFile().isFile()) {
                         showErrorPopupMessage(errorTitle, "Please select an Image File to send to the selected user");
                         return;
                     }
-                    
-                    Path imagePath = Paths.get(_fileChooser.getSelectedFile().getAbsolutePath());   
-                    
-                    if(!Files.exists(imagePath))
-                    {
-                        showErrorPopupMessage(errorTitle, "Please select an Image File to send to the selected user");
-                        return; 
-                    }
-                                     
-                    message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, Files.readAllBytes(imagePath), textData);          
-                }
-            }                        
-        }
-        catch (IOException ex) 
-        {
-           logException(ex);
-        }
-            
 
-       if(message == null)
-       {
-           showErrorPopupMessage(errorTitle, "Please select a valid message type and user to send the message");
-           return;
-       }
-      
+                    Path imagePath = Paths.get(_fileChooser.getSelectedFile().getAbsolutePath());
+
+                    if (!Files.exists(imagePath)) {
+                        showErrorPopupMessage(errorTitle, "Please select an Image File to send to the selected user");
+                        return;
+                    }
+
+                    message = MessageFactory.CreateMessage(_currentUser, receiver, messageType,
+                            Files.readAllBytes(imagePath), textData);
+                }
+            }
+        } catch (IOException ex) {
+            logException(ex);
+        }
+
+        if (message == null) {
+            showErrorPopupMessage(errorTitle, "Please select a valid message type and user to send the message");
+            return;
+        }
 
         if (_outputStream == null)
             startListener();
-        
-          sendMessage(message);   
-       
-        textFieldInputMessage.setText(""); 
+
+        sendMessage(message);
+
+        textFieldInputMessage.setText("");
         textFieldInputMessage.setEnabled(true);
         ButtonLoadImage.setVisible(true);
     }
-   
-  
+
     private void ButtonLoadImageActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ButtonLoadImageActionPerformed
 
         if (_fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION)
             return;
 
         // Load an image using ImageIcon
-        ImageIcon imageIcon = new ImageIcon(_fileChooser.getSelectedFile().getAbsolutePath()); // Replace with your                                                                                               // image file path
-        setImageIconToLabel(imageIcon);       
+        ImageIcon imageIcon = new ImageIcon(_fileChooser.getSelectedFile().getAbsolutePath()); // Replace with your //
+                                                                                               // image file path
+        setImageIconToLabel(imageIcon);
     }// GEN-LAST:event_ButtonLoadImageActionPerformed
 
     private void ComboBoxMessageTypeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_ComboBoxMessageTypeActionPerformed
-        
+
         var messageType = getMessageType(String.valueOf(ComboBoxMessageType.getSelectedItem()));
-         
+
         textFieldInputMessage.setEnabled(false);
         ButtonLoadImage.setVisible(false);
-        
-        if(messageType == MessageType.SendText || messageType == MessageType.SendImageWithText)
-        {
+
+        if (messageType == MessageType.SendText || messageType == MessageType.SendImageWithText) {
             textFieldInputMessage.setEnabled(true);
-            ButtonLoadImage.setVisible(true); 
+            ButtonLoadImage.setVisible(true);
         }
-        
+
     }// GEN-LAST:event_ComboBoxMessageTypeActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
 
         var authForm = new ChatClientAuth(this);
-              
-        authForm.setVisible(true);                
+
+        authForm.setVisible(true);
         var authUser = authForm.getSystemUserAuth();
         authForm.dispose();
-         
-       if(authUser != null)
-       {        
+
+        if (authUser != null) {
             _currentUser = new SystemUser(authUser);
+            _passPhrase = authUser.getKeyPassphrase();
             _ipAddress = authUser.getServerIpAddress();
             _portNumber = authUser.getPortNumber();
 
             startListener();
-            try
-            {
-                MessageProtocol message = MessageFactory.CreateMessage(_currentUser, null, MessageType.SystemUserAuth, null, null);
-                sendMessage(message);          
-            }
-            catch (IOException ex)
-            {
+            try {
+                MessageProtocol message = MessageFactory.CreateMessage(_currentUser, null, MessageType.SystemUserAuth,
+                        null, null);
+                sendMessage(message);
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
-       }
+        }
     }
-// GEN-LAST:event_jMenuItem1ActionPerformed
+    // GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void ButtonExitApplicationActionPerformed(java.awt.event.ActionEvent evt) {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",
@@ -806,6 +814,7 @@ public class ChatClient extends javax.swing.JFrame {
             System.exit(0);
         }
     }
+
      
    private void closeConnection()
     {
@@ -821,33 +830,30 @@ public class ChatClient extends javax.swing.JFrame {
             logException(ex);
         }
     }  
-    
-    private void logException(Exception ex)
-    {
+       
+    private void logException(Exception ex) {
+
         ex.printStackTrace();
-        Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);                 
+        Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
     }
-    
-    private void showErrorPopupMessage(String title, String errorMessage) 
-    {
+
+    private void showErrorPopupMessage(String title, String errorMessage) {
         if (errorMessage == null || errorMessage.isEmpty())
             return;
-                
+
         JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
-    }  
-    
-    private void setImageIconToLabel(ImageIcon imageIcon)
-    {
-        if(imageIcon == null)
+    }
+
+    private void setImageIconToLabel(ImageIcon imageIcon) {
+        if (imageIcon == null)
             return;
-        
+
         int imageWith = Labelmage.getHeight() - 1;
         Image scaledImage = imageIcon.getImage().getScaledInstance(imageWith, imageWith, Image.SCALE_SMOOTH);
-        Labelmage.setIcon(new ImageIcon(scaledImage)); 
+        Labelmage.setIcon(new ImageIcon(scaledImage));
     }
-       
-    private ImageIcon byteArrayToImageIcon(byte[] imageData) throws IOException 
-    {
+
+    private ImageIcon byteArrayToImageIcon(byte[] imageData) throws IOException {
         // Convert the byte array to an Image
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
         java.awt.Image image = ImageIO.read(inputStream);
@@ -855,38 +861,33 @@ public class ChatClient extends javax.swing.JFrame {
         // Create an ImageIcon from the Image
         return new ImageIcon(image);
     }
-    
-    private void appendTextAreaLive(IMessage message)
-    {
-        if(message == null)        
+
+    private void appendTextAreaLive(IMessage message) {
+        if (message == null)
             return;
-                
-       appendTextAreaLive(message.toClientString());          
+
+        appendTextAreaLive(message.toClientString());
     }
-    
-    private void appendTextAreaLive(String message)
-    {
+
+    private void appendTextAreaLive(String message) {
         textAreaOutput.append(String.format("IN:%s\n", message));
         appendTextAreaOutputLogs(message);
     }
-    
-    private void appendTextAreaOutputLogs(MessageProtocol message)
-    {
-        if(message == null)        
+
+    private void appendTextAreaOutputLogs(MessageProtocol message) {
+        if (message == null)
             return;
-       appendTextAreaOutputLogs(message.toClientString());          
-    }
-    
-    private void appendTextAreaOutputLogs(String message)
-    {
-        textAreaOutputLogs.append(String.format("IN:%s\n", message));          
+        appendTextAreaOutputLogs(message.toClientString());
     }
 
-   
+    private void appendTextAreaOutputLogs(String message) {
+        textAreaOutputLogs.append(String.format("IN:%s\n", message));
+    }
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ERROR MESSAGES">
-    
+
     /**
      * shows a message popup
      * 

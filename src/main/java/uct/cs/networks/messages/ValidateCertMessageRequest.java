@@ -13,26 +13,27 @@ import uct.cs.networks.models.SystemUser;
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
 public class ValidateCertMessageRequest extends MessageBase implements IMessage {
-    
+
     private final SystemUser _verifyUser;
+
     public ValidateCertMessageRequest(SystemUser sender, SystemUser receiver, SystemUser verifyUser) {
-       super(MessageType.ValidateCertRequest, sender, receiver);
-       _verifyUser = verifyUser;
-    }  
-    
+        super(MessageType.ValidateCertRequest, sender, receiver);
+        _verifyUser = verifyUser;
+    }
+
     public SystemUser getVerifyUser() {
         return _verifyUser;
     }
-    
+
     /**
      *
      * @return
      */
     @Override
-    public String toClientString() {        
+    public String toClientString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(super.toClientString());      
-        sb.append(String.format("Verify Public Certificate of %s |", _verifyUser.getName()));   
+        sb.append(super.toClientString());
+        sb.append(String.format("Verify Public Certificate of %s |", _verifyUser.getName()));
 
         return sb.toString();
     }
@@ -40,7 +41,7 @@ public class ValidateCertMessageRequest extends MessageBase implements IMessage 
     @Override
     public String toServerString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Verify Public Certificate of %s |", _verifyUser.getName()));       
+        sb.append(String.format("Verify Public Certificate of %s |", _verifyUser.getName()));
 
         return sb.toString();
     }
