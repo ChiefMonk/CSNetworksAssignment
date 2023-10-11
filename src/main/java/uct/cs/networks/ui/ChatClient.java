@@ -24,6 +24,7 @@ import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
+import uct.cs.networks.utils.CompressionHelper;
 import uct.cs.networks.utils.EncryptionHelper;
 import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
@@ -59,7 +60,7 @@ public class ChatClient extends javax.swing.JFrame {
     private ObjectOutputStream _outputStream;
     private ObjectInputStream _inputStream;
 
-    private Socket _socket;      
+    private Socket _secureSocket;      
 
     /**
      * Creates new form ToolGUI
@@ -409,9 +410,11 @@ public class ChatClient extends javax.swing.JFrame {
        try 
        {           
             if (message == null)
-                return;                        
-
-            _outputStream.writeObject(message);
+                return;  
+            
+            var compressMessage = CompressionHelper.compressMessage(message);
+            
+            _outputStream.writeObject(compressMessage);
             _outputStream.flush();
             
             _sendMessageIdList.add(message.getId());           
@@ -799,9 +802,25 @@ public class ChatClient extends javax.swing.JFrame {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",
                 "Exit the Application", JOptionPane.YES_NO_OPTION);
         if (reply == JOptionPane.YES_OPTION) {
+            closeConnection();
             System.exit(0);
         }
     }
+     
+   private void closeConnection()
+    {
+        try
+        {                         
+            _inputStream.close();                   
+             _outputStream.flush();                  
+             _outputStream.close();
+            _secureSocket.close();
+        }
+        catch (IOException ex) 
+        {
+            logException(ex);
+        }
+    }  
     
     private void logException(Exception ex)
     {
@@ -911,11 +930,11 @@ public class ChatClient extends javax.swing.JFrame {
     private void startListener() {
         try {
             // Connect to the server
-            _socket = new Socket(_ipAddress, _portNumber);
+            _secureSocket = new Socket(_ipAddress, _portNumber);
 
             // Create reader and writer
-            _outputStream = new ObjectOutputStream(_socket.getOutputStream());
-            _inputStream = new ObjectInputStream(_socket.getInputStream());
+            _outputStream = new ObjectOutputStream(_secureSocket.getOutputStream());
+            _inputStream = new ObjectInputStream(_secureSocket.getInputStream());
 
             onSessionStart();
 
@@ -924,7 +943,7 @@ public class ChatClient extends javax.swing.JFrame {
                 try {
                     Object object;
                     while ((object = _inputStream.readObject()) != null) {
-                        MessageProtocol message = MessageFactory.getMessage(object);
+                        MessageProtocol message  = CompressionHelper.decompressMessage(_inputStream);                    
                         processReceivedMessage(message);
                     }
                 } catch (IOException e) {

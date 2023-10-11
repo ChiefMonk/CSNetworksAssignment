@@ -14,6 +14,7 @@ import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
+import uct.cs.networks.utils.CompressionHelper;
 import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
 
@@ -230,14 +231,13 @@ public class ChatServer extends javax.swing.JFrame {
         }            
     }
     
-    private void processReceivedMessage(ChatClientHandler client, Object messageObject) 
+    private void processReceivedMessage(ChatClientHandler client, MessageProtocol message) 
     {   
-        if(messageObject == null)
+        if(message == null)
             return;
          
         try
-        {                 
-            MessageProtocol message = MessageFactory.getMessage(messageObject);
+        {                            
             appendInMessage(" =>:" + message.toServerString());
             
             // Message if for the server
@@ -334,7 +334,8 @@ public class ChatServer extends javax.swing.JFrame {
             {
                 Object messageObject;
                 while ((messageObject = _inputStream.readObject()) != null) {
-                    processReceivedMessage(this, messageObject);                   
+                    MessageProtocol message  = CompressionHelper.decompressMessage(_inputStream);          
+                    processReceivedMessage(this, message);                   
                 }
             }
             catch (IOException | ClassNotFoundException ex) 
@@ -352,7 +353,10 @@ public class ChatServer extends javax.swing.JFrame {
         {           
             try
             {
-               _outputStream.writeObject(message);  
+                var compressMessage = CompressionHelper.compressMessage(message);
+                 
+               _outputStream.writeObject(compressMessage);  
+               _outputStream.flush();              
             }
             catch (IOException ex) 
             {
@@ -372,13 +376,19 @@ public class ChatServer extends javax.swing.JFrame {
                
         private void removeClient()
         {
+            closeSocket();
             _chatClientList.remove(this);
         }
         
         private void closeSocket()
         {
             try
-            {
+            {                         
+                _inputStream.close();
+                   
+                 _outputStream.flush();                  
+                 _outputStream.close();
+                 
                 _secureSocket.close();
             }
             catch (IOException ex) 
