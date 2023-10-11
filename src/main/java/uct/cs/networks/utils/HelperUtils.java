@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
 
 /**
@@ -21,63 +23,59 @@ import uct.cs.networks.proto.ProtocolBody;
  * @author Enock Shezi (SHZENO001@myuct.ac.za)
  */
 
-public class HelperUtils 
-{    
+public class HelperUtils {
     private static final String DATETIME_FORMAT = "yyyy.MM.dd.HH.mm.ss";
     public static final String SERVER_ID = "388f371c-b0d8-4dbc-a36b-0e4303a472d9";
-    
-    public static String GetCuttentUtcTimestamp()
-    {        
-       return new SimpleDateFormat(DATETIME_FORMAT).format(new java.util.Date());              
-    }        
-    
-    public static byte[] getImageData(String imagePath)
-    {
-        try 
-        {
+
+    public static String GetCuttentUtcTimestamp() {
+        return new SimpleDateFormat(DATETIME_FORMAT).format(new java.util.Date());
+    }
+
+    public static byte[] getImageData(String imagePath) {
+        try {
             File file = new File(imagePath);
-            if(!Files.exists(file.toPath()))
-            {
+            if (!Files.exists(file.toPath())) {
                 return null;
             }
-            
+
             return Files.readAllBytes(file.toPath());
-        } 
-        catch (IOException ex) 
-        {
+        } catch (IOException ex) {
             Logger.getLogger(HelperUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
     }
 
-    public static String convertProtocolBodyToBase64String(ProtocolBody body) throws IOException 
-    {
+    public static String convertProtocolBodyToBase64String(ProtocolBody body) throws IOException {
         return convertObjectToBase64String(body);
     }
 
-    public static ProtocolBody convertBase64StringToProtocolBody(String base64String) throws IOException, ClassNotFoundException 
-    {
-        Object obj = convertBase64StringToObject(base64String);        
+    public static ProtocolBody convertBase64StringToProtocolBody(String base64String)
+            throws IOException, ClassNotFoundException {
+        Object obj = convertBase64StringToObject(base64String);
         return (ProtocolBody) obj;
     }
 
-    public static String convertObjectToBase64String(Object obj) throws IOException 
-    {
+    public static MessageProtocol convertBase64StringToMessageProtocol(String base64String)
+            throws IOException, ClassNotFoundException {
+        Object obj = convertBase64StringToObject(base64String);
+        return (MessageProtocol) obj;
+    }
+
+    public static String convertObjectToBase64String(Object obj) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
             objectOutputStream.writeObject(obj);
         }
         return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
     }
-    
-    public static Object convertBase64StringToObject(String base64String) throws IOException, ClassNotFoundException 
-    {
+
+    public static Object convertBase64StringToObject(String base64String) throws IOException, ClassNotFoundException {
         byte[] data = Base64.getDecoder().decode(base64String);
         Object obj;
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(data))) {
             obj = objectInputStream.readObject();
         }
         return obj;
-    }   
+    }
 }

@@ -19,11 +19,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
 import uct.cs.networks.enums.*;
 import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
+import uct.cs.networks.utils.AESEncryption;
 import uct.cs.networks.utils.EncryptionHelper;
 import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
@@ -422,6 +425,15 @@ public class ChatClient extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private SystemUser findByID(String id) {
+        for (SystemUser user : _listOfUsers.values()) {
+            if (user.getId().equals(id)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     private void sendMessage(MessageProtocol message) {
         try {
             if (message == null)
@@ -469,6 +481,8 @@ public class ChatClient extends javax.swing.JFrame {
             if (message.getType() == MessageType.SessionStart) {
                 cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser, _passPhrase); // decrypt
                 var plainBody = cipherBody;
+                MessageProtocol messageProtocol = (MessageProtocol) HelperUtils
+                        .convertBase64StringToMessageProtocol(plainBody);
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionStartMessage) messageBody.getMessage();
 
@@ -477,10 +491,22 @@ public class ChatClient extends javax.swing.JFrame {
                 // return;
 
                 appendTextAreaLive(actualMessage);
+                // Add session key to user in userList
+                AESEncryption aesEncryption = new AESEncryption();
+                String key = null;
+                try {
+                    key = aesEncryption.serializeKeyToString(actualMessage.getSessionKey()); // add session key from
+                                                                                             // actual message
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                findByID(messageProtocol.getSender()).setSecretKey(key); // Find user
+
             }
 
             if (message.getType() == MessageType.SessionEnd) {
-                // decrypt
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionEndMessage) messageBody.getMessage();
@@ -506,7 +532,7 @@ public class ChatClient extends javax.swing.JFrame {
             }
 
             if (message.getType() == MessageType.SendText) {
-                // decrypt
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendTextMessage) messageBody.getMessage();
@@ -519,7 +545,7 @@ public class ChatClient extends javax.swing.JFrame {
             }
 
             if (message.getType() == MessageType.SendImageWithText) {
-                // decrypt
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendImageWithTextMessage) messageBody.getMessage();
@@ -634,6 +660,7 @@ public class ChatClient extends javax.swing.JFrame {
         return null;
     }
 
+    // Send Messages
     private void ButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {
 
         String errorTitle = "Message Type Error";

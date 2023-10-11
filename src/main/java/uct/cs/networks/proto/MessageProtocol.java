@@ -16,8 +16,8 @@ public class MessageProtocol implements Serializable {
     private final String _id;
     private final String _timestamp;
     private final MessageType _type;
-    private final String _sender;
-    private final String _receiver;
+    private final String _sender; // User ID
+    private final String _receiver; // User ID
     private Object _cipherBody;
 
     public MessageProtocol(IMessage message, boolean createHash, SystemUser receiver) throws IOException {
@@ -35,16 +35,32 @@ public class MessageProtocol implements Serializable {
             body = new ProtocolBody(message, null);
 
         String bodyString = HelperUtils.convertProtocolBodyToBase64String(body);
-        String encryptedBodyString;
+        String encryptedBodyString = null;
         // Type of encryption depends on type of messaged (normal message uses shared
         // key, new connection = RSA key)
+
         switch (message.getType()) {
             case SessionStart -> {
                 encryptedBodyString = EncryptionHelper.encryptwithPublicKey(bodyString, receiver);
             }
+            case SendText -> {
+                encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
+            }
+            case SendImageWithText -> {
+                encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
+            }
+            case SessionEnd -> {
+                encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
+            }
+            case SystemUserAuth -> {
+                break;
+            }
         }
-        // _cipherBody = encrypted bodyString
-        _cipherBody = bodyString;
+        if (encryptedBodyString != null) {
+            _cipherBody = encryptedBodyString;
+        } else {
+            _cipherBody = bodyString;
+        }
     }
 
     public String getId() {

@@ -23,8 +23,8 @@ public abstract class MessageBase implements Serializable {
         _id = java.util.UUID.randomUUID().toString();
         _timestamp = HelperUtils.GetCuttentUtcTimestamp();
         _type = type;
-        _sender = "The Server";
-        _receiver = "The Server";
+        _sender = sender.getId();
+        _receiver = sender.getId();
 
         if (sender != null)
             _sender = sender.getName();

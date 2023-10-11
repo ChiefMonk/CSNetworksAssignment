@@ -61,7 +61,7 @@ public class EncryptionHelper {
     }
 
     // UserModel has shared secret key as a string
-    public static Object encryptWithSharedKey(String message, SystemUser reciever) {
+    public static String encryptWithSharedKey(String message, SystemUser reciever) {
         AESEncryption aesEncryption = new AESEncryption();
         try {
             String encrypted = aesEncryption.encrypt(message,
@@ -73,7 +73,7 @@ public class EncryptionHelper {
         }
     }
 
-    public static Object decryptWithSharedKey(String encryptedMessage, SystemUser reciever) {
+    public static String decryptWithSharedKey(String encryptedMessage, SystemUser reciever) {
         try {
             AESEncryption aesEncryption = new AESEncryption();
             String decryptedString = aesEncryption.decrypt(encryptedMessage,

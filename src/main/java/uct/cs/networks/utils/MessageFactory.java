@@ -5,6 +5,7 @@
 package uct.cs.networks.utils;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.List;
 import uct.cs.networks.enums.*;
 import static uct.cs.networks.enums.MessageType.BroadcastUserList;
@@ -40,6 +41,17 @@ public class MessageFactory {
         return new MessageProtocol(new ValidateCertMessageRequest(sender, receiver, verifyUser), false, null);
     }
 
+    private static Key createSharedKey() {
+        AESEncryption aesEncryption = new AESEncryption();
+        Key key = null;
+        try {
+            key = aesEncryption.getKeyFromKeyGenerator();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return key;
+    }
+
     public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type,
             byte[] imageData, String textData) throws IOException {
         IMessage message = null;
@@ -57,7 +69,7 @@ public class MessageFactory {
             }
 
             case SessionStart -> {
-                message = new SessionStartMessage(sender, receiver);
+                message = new SessionStartMessage(sender, receiver, createSharedKey());
                 createHash = false;
                 break;
             }
