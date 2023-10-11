@@ -18,6 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import uct.cs.networks.enums.*;
 import uct.cs.networks.messages.*;
 import uct.cs.networks.models.*;
@@ -431,10 +433,8 @@ public class ChatClient extends javax.swing.JFrame {
         try {
             if (message == null)
                 return;  
-            
-            var compressMessage = CompressionHelper.compressMessage(message);
-            
-            _outputStream.writeObject(compressMessage);    
+                       
+            _outputStream.writeObject(message);    
             _outputStream.flush();
 
             _sendMessageIdList.add(message.getId());
@@ -923,8 +923,8 @@ public class ChatClient extends javax.swing.JFrame {
             _secureSocket = new Socket(_ipAddress, _portNumber);
 
             // Create reader and writer
-            _outputStream = new ObjectOutputStream(_secureSocket.getOutputStream());
-            _inputStream = new ObjectInputStream(_secureSocket.getInputStream());
+            _outputStream = new ObjectOutputStream(new GZIPOutputStream(_secureSocket.getOutputStream()));
+            _inputStream = new ObjectInputStream(new GZIPInputStream(_secureSocket.getInputStream()));
 
             onSessionStart();
 
@@ -933,7 +933,7 @@ public class ChatClient extends javax.swing.JFrame {
                 try {
                     Object object;
                     while ((object = _inputStream.readObject()) != null) {
-                        MessageProtocol message  = CompressionHelper.decompressMessage(_inputStream);                    
+                        MessageProtocol message  = MessageFactory.getMessage(object);                    
                         processReceivedMessage(message);
                     }
                 } catch (IOException e) {

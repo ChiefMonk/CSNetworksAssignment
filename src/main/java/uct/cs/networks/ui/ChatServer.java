@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import javax.swing.JOptionPane;
 import uct.cs.networks.enums.MessageType;
 import uct.cs.networks.interfaces.IMessage;
@@ -231,13 +233,14 @@ public class ChatServer extends javax.swing.JFrame {
         }            
     }
     
-    private void processReceivedMessage(ChatClientHandler client, MessageProtocol message) 
+    private void processReceivedMessage(ChatClientHandler client, Object messageObject) 
     {   
-        if(message == null)
+        if(messageObject == null)
             return;
          
         try
-        {                            
+        {      
+            MessageProtocol message = MessageFactory.getMessage(messageObject);
             appendInMessage(" =>:" + message.toServerString());
             
             // Message if for the server
@@ -318,8 +321,8 @@ public class ChatServer extends javax.swing.JFrame {
             
             try
             {               
-                _inputStream = new ObjectInputStream(_secureSocket.getInputStream());       
-                _outputStream = new ObjectOutputStream (_secureSocket.getOutputStream());                     
+                _inputStream = new ObjectInputStream(new GZIPInputStream(_secureSocket.getInputStream()));       
+                _outputStream = new ObjectOutputStream (new GZIPOutputStream(_secureSocket.getOutputStream()));                     
             }
             catch(IOException ex)
             {
@@ -333,9 +336,8 @@ public class ChatServer extends javax.swing.JFrame {
             try
             {
                 Object messageObject;
-                while ((messageObject = _inputStream.readObject()) != null) {
-                    MessageProtocol message  = CompressionHelper.decompressMessage(_inputStream);          
-                    processReceivedMessage(this, message);                   
+                while ((messageObject = _inputStream.readObject()) != null) {                 
+                    processReceivedMessage(this, messageObject);                   
                 }
             }
             catch (IOException | ClassNotFoundException ex) 
@@ -352,10 +354,8 @@ public class ChatServer extends javax.swing.JFrame {
         public void sendMessage(MessageProtocol message)
         {           
             try
-            {
-                var compressMessage = CompressionHelper.compressMessage(message);
-                 
-               _outputStream.writeObject(compressMessage);  
+            {               
+               _outputStream.writeObject(message);  
                _outputStream.flush();              
             }
             catch (IOException ex) 

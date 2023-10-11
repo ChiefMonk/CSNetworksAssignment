@@ -18,7 +18,7 @@ import java.util.zip.*;
  */
 public class CompressionHelper {
     
-    public static byte[] compressMessage(MessageProtocol message) throws IOException
+    private static byte[] compressMessage(MessageProtocol message) throws IOException
     {
          // Create a ByteArrayOutputStream to store the compressed object
          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -27,18 +27,18 @@ public class CompressionHelper {
          GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
          
         // Write the object to the ObjectOutputStream
-        // Create an ObjectOutputStream to serialize the object
-        try (java.io.ObjectOutputStream objectOutputStream = new ObjectOutputStream(gzipOutputStream)) {
-            // Write the object to the ObjectOutputStream
-            objectOutputStream.writeObject(message);
-            // Close the ObjectOutputStream
-        }
-
+        java.io.ObjectOutputStream objectOutputStream = new ObjectOutputStream(gzipOutputStream);
+        objectOutputStream.writeObject(message);
+        objectOutputStream.flush();
+        
+        gzipOutputStream.write(byteArrayOutputStream.toByteArray());
+        gzipOutputStream.finish();      
+                         
         // Get the compressed byte array
          return byteArrayOutputStream.toByteArray();
     }
     
-    public static MessageProtocol decompressMessage(ObjectInputStream stream) throws IOException, ClassNotFoundException
+    private static MessageProtocol decompressMessage(ObjectInputStream stream) throws IOException, ClassNotFoundException
     {
         // Create a GZIPOutputStream to decompress the data
          GZIPInputStream gzipInputStream = new GZIPInputStream(stream);
