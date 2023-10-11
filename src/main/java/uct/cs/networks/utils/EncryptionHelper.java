@@ -25,7 +25,7 @@ public class EncryptionHelper {
     }
 
     // Takes in a message as a string and returns a string which has been encryped
-    public static Object encryptwithPublicKey(String message, SystemUser receiver) {
+    public static String encryptwithPublicKey(String message, SystemUser receiver) {
         PgpEncryptionUtil pgpEncryptionUtil = null;
         pgpEncryptionUtil = PgpEncryptionUtil.builder()
                 .armor(true)
@@ -45,7 +45,7 @@ public class EncryptionHelper {
 
     // Takes in an encoded message as a string and retunrs the decoded message as a
     // String.
-    public static Object decryptwithPrivateKey(String encryptedMessage, SystemUser reciever, String password) {
+    public static String decryptwithPrivateKey(String encryptedMessage, SystemUser reciever, String password) {
         PgpDecryptionUtil pgpDecryptionUtil = null;
         byte[] encryptedMessageBytes = encryptedMessage.getBytes(Charset.defaultCharset());
         String decrypted;
@@ -89,12 +89,10 @@ public class EncryptionHelper {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             String data = message.getMessageData();
-            
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
-        } 
-        catch (NoSuchAlgorithmException e) {
-              e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
