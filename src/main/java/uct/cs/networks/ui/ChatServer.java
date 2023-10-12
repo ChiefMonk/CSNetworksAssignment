@@ -325,8 +325,10 @@ public class ChatServer extends javax.swing.JFrame {
             try {
                 System.out.println("Printed from line 326 " + _systemUser.getName() + message.toServerString());
                 _outputStream.writeObject(message);
+                System.out.println("Active");
                 _outputStream.flush();
             } catch (IOException ex) {
+                System.out.println("Not Active");
                 logException(ex);
             }
         }

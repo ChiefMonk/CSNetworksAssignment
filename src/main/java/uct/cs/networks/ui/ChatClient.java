@@ -421,7 +421,9 @@ public class ChatClient extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private SystemUser findByID(String id) {
+        System.out.println("Looking for: " + id);
         for (SystemUser user : _listOfUsers.values()) {
+            System.out.println(user.getId());
             if (user.getId().equals(id)) {
                 return user;
             }
@@ -453,6 +455,7 @@ public class ChatClient extends javax.swing.JFrame {
 
         try {
             MessageProtocol message = MessageFactory.getMessage(messageObject);
+            System.out.println("TestProcessonCLient" + message.getSender() + "->" + message.getReceiver());
             appendTextAreaOutputLogs(message);
 
             _receivedMessageIdList.add(message.getId());
@@ -478,8 +481,9 @@ public class ChatClient extends javax.swing.JFrame {
                 // cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser,
                 // _passPhrase); // decrypt
                 var plainBody = cipherBody;
-                MessageProtocol messageProtocol = (MessageProtocol) HelperUtils
-                        .convertBase64StringToMessageProtocol(plainBody);
+                // MessageProtocol messageProtocol = (MessageProtocol) HelperUtils ->> Lets just
+                // use message above
+                // .convertBase64StringToMessageProtocol(message);
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionStartMessage) messageBody.getMessage();
 
@@ -499,7 +503,7 @@ public class ChatClient extends javax.swing.JFrame {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                findByID(messageProtocol.getSender()).setSecretKey(key); // Find user and add key
+                findByID(message.getSender()).setSecretKey(key); // Find user and add key
 
             }
 

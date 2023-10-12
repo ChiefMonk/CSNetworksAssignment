@@ -26,11 +26,13 @@ public abstract class MessageBase implements Serializable {
         _sender = sender.getId();
         _receiver = sender.getId();
 
-        if (sender != null)
-            _sender = sender.getName();
-
-        if (receiver != null)
-            _receiver = receiver.getName();
+        /*
+         * if (sender != null)
+         * _sender = sender.getName();
+         * 
+         * if (receiver != null)
+         * _receiver = receiver.getName();
+         */
     }
 
     public String getId() {
