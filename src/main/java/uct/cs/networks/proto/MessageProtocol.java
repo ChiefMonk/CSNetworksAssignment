@@ -41,10 +41,10 @@ public class MessageProtocol implements Serializable {
 
         switch (message.getType()) {
             case SessionStart -> {
-                encryptedBodyString = EncryptionHelper.encryptwithPublicKey(bodyString, receiver);
+                encryptedBodyString = bodyString; // EncryptionHelper.encryptwithPublicKey(bodyString, receiver);
             }
             case SendText -> {
-                encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
+                encryptedBodyString = bodyString;// EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
             }
             case SendImageWithText -> {
                 encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
@@ -53,7 +53,7 @@ public class MessageProtocol implements Serializable {
                 encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
             }
             case SystemUserAuth -> { // This should be server locked but then we need broadcast type
-                encryptedBodyString = EncryptionHelper.encryptwithPublicKey(bodyString, "server");
+                encryptedBodyString = bodyString; // EncryptionHelper.encryptwithPublicKey(bodyString, "server");
             }
             case ValidateCertRequest -> // Done with public key as there is no "session" with server
             {

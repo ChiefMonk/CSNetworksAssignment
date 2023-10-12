@@ -465,25 +465,28 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (BroadcastSystemUsersMessage) messageBody.getMessage();
 
-                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
-                    return;
-                }
+                // if (!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest())) {
+                // return;
+                // }
 
                 appendTextAreaLive(actualMessage);
                 processUserList(actualMessage.getUserList());
             }
 
             if (message.getType() == MessageType.SessionStart) {
-                cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser, _passPhrase); // decrypt
+                // cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser,
+                // _passPhrase); // decrypt
                 var plainBody = cipherBody;
                 MessageProtocol messageProtocol = (MessageProtocol) HelperUtils
                         .convertBase64StringToMessageProtocol(plainBody);
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionStartMessage) messageBody.getMessage();
 
-                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
-                    return;
-                }
+                // if (!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest())) {
+                // return;
+                // }
 
                 appendTextAreaLive(actualMessage);
                 // Add session key to user in userList
@@ -506,9 +509,10 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionEndMessage) messageBody.getMessage();
 
-                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
-                    return;
-                }
+                // if (!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest())) {
+                // return;
+                // }
 
                 appendTextAreaLive(actualMessage);
                 // Remove user from _listOfUsers
@@ -522,22 +526,25 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (ValidateCertMessageResponse) messageBody.getMessage();
 
-                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
-                    return;
-                }
+                // if (!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest())) {
+                // return;
+                // }
 
                 appendTextAreaLive(actualMessage);
             }
 
             if (message.getType() == MessageType.SendText) {
-                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
+                // cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody,
+                // findByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendTextMessage) messageBody.getMessage();
 
-                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
-                    return;
-                }
+                // if (!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest())) {
+                // return;
+                // }
 
                 appendTextAreaLive(actualMessage);
             }
@@ -548,9 +555,10 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendImageWithTextMessage) messageBody.getMessage();
 
-                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
-                    return;
-                }
+                // if (!validateHashAgainstMessage(actualMessage,
+                // messageBody.getMessageDigest())) {
+                // return;
+                // }
 
                 appendTextAreaLive(actualMessage);
                 setImageIconToLabel(byteArrayToImageIcon(actualMessage.getImageData()));
@@ -921,8 +929,12 @@ public class ChatClient extends javax.swing.JFrame {
             _secureSocket = new Socket(_ipAddress, _portNumber);
 
             // Create reader and writer
-            _outputStream = new ObjectOutputStream(new GZIPOutputStream(_secureSocket.getOutputStream()));
-            _inputStream = new ObjectInputStream(new GZIPInputStream(_secureSocket.getInputStream()));
+            _outputStream = new ObjectOutputStream(_secureSocket.getOutputStream());
+            _inputStream = new ObjectInputStream(_secureSocket.getInputStream());
+            // _outputStream = new ObjectOutputStream(new
+            // GZIPOutputStream(_secureSocket.getOutputStream()));
+            // _inputStream = new ObjectInputStream(new
+            // GZIPInputStream(_secureSocket.getInputStream()));
 
             onSessionStart();
 

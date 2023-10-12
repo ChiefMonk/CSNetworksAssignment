@@ -233,18 +233,21 @@ public class ChatServer extends javax.swing.JFrame {
             // Message if for the server
             if (message.getType() == MessageType.SystemUserAuth) {
                 var cipherBody = message.getCipherBody().toString();
-                cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, "server", "networks"); // decrypt
+                // cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, "server",
+                // "networks"); // decrypt
                 var plainBody = cipherBody;
 
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
 
                 var actualMessage = (SystemUserAuthenticationMessage) messageBody.getMessage();
+                System.out.println("actualMessage" + actualMessage);
                 client.setSystemUser(actualMessage.getUser());
 
                 MessageProtocol outMessage = MessageFactory.CreateBroadcastSystemUsersMessage(_serverUser,
                         client.getSystemUser(), getAllSystemUsers());
                 broadcastMessage(outMessage);
             } else {
+                System.out.println("Broadcast****" + message);
                 broadcastMessage(message);
             }
         } catch (IOException | ClassNotFoundException ex) {
@@ -292,8 +295,12 @@ public class ChatServer extends javax.swing.JFrame {
             _secureSocket = secureSocket;
 
             try {
-                _inputStream = new ObjectInputStream(new GZIPInputStream(_secureSocket.getInputStream()));
-                _outputStream = new ObjectOutputStream(new GZIPOutputStream(_secureSocket.getOutputStream()));
+                _inputStream = new ObjectInputStream(_secureSocket.getInputStream());
+                _outputStream = new ObjectOutputStream(_secureSocket.getOutputStream());
+                // _inputStream = new ObjectInputStream(new
+                // GZIPInputStream(_secureSocket.getInputStream()));
+                // _outputStream = new ObjectOutputStream(new
+                // GZIPOutputStream(_secureSocket.getOutputStream()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -316,6 +323,7 @@ public class ChatServer extends javax.swing.JFrame {
 
         public void sendMessage(MessageProtocol message) {
             try {
+                System.out.println("Printed from line 326 " + _systemUser.getName() + message.toServerString());
                 _outputStream.writeObject(message);
                 _outputStream.flush();
             } catch (IOException ex) {
