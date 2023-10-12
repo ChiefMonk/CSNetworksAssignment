@@ -20,7 +20,9 @@ public class SystemUser implements Serializable {
     private final String _emailAddress;
     private String _secretKey;
     private String _publicKey; // file path to key
+    private String _privateKey;
     private byte[] _publicKeyStream = null;
+    private byte[] _privateKeyStream = null;
 
     public SystemUser(SystemUserAuthentication authUser) {
         this(authUser.getId(), authUser.getName(), authUser.getEmailAddress(), authUser.getKeyPassphrase());
@@ -34,7 +36,9 @@ public class SystemUser implements Serializable {
         RSAKeyGenerator keyGenerator = new RSAKeyGenerator();
         keyGenerator.createKeys(name, password); // will create keys in path below
         _publicKey = "keys\\UserPublicKey.asc";
+        _privateKey = "keys\\UserPrivateKey.asc";
         setPublicKey();
+        setPrivateKey();
     }
 
     public SystemUser(String id, String name, String emailAddress, byte[] publicKeyStream) {
@@ -68,9 +72,25 @@ public class SystemUser implements Serializable {
         return _publicKeyStream;
     }
 
+    public void removeSecretKey() {
+        this._secretKey = null;
+    }
+
+    public byte[] getPrivateKey() {
+        return _privateKeyStream;
+    }
+
     private void setPublicKey() {
         try {
             _publicKeyStream = IOUtils.toByteArray(new FileInputStream(_publicKey));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setPrivateKey() {
+        try {
+            _privateKeyStream = IOUtils.toByteArray(new FileInputStream(_publicKey));
         } catch (Exception e) {
             e.printStackTrace();
         }

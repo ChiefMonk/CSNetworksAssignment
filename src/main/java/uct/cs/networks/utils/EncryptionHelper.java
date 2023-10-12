@@ -1,5 +1,6 @@
 package uct.cs.networks.utils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -7,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+import org.apache.commons.io.IOUtils;
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.openpgp.PGPException;
@@ -43,6 +45,31 @@ public class EncryptionHelper {
         }
     }
 
+    // Takes in a message as a string and returns a string which has been encryped
+    public static String encryptwithPublicKey(String message, String server) {
+        PgpEncryptionUtil pgpEncryptionUtil = null;
+        pgpEncryptionUtil = PgpEncryptionUtil.builder()
+                .armor(true)
+                .compressionAlgorithm(CompressionAlgorithmTags.ZIP)
+                .symmetricKeyAlgorithm(SymmetricKeyAlgorithmTags.AES_128)
+                .withIntegrityCheck(true)
+                .build();
+        byte[] _publicKeyStream = null;
+        try {
+            _publicKeyStream = IOUtils.toByteArray(new FileInputStream("keys\\ServerPublicKey.asc"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            byte[] encryptedBytes = pgpEncryptionUtil.encrypt(message.getBytes(Charset.defaultCharset()),
+                    _publicKeyStream); // Needs to be as an input stream
+            return ByteArray2String(encryptedBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     // Takes in an encoded message as a string and retunrs the decoded message as a
     // String.
     public static String decryptwithPrivateKey(String encryptedMessage, SystemUser reciever, String password) {
@@ -50,7 +77,28 @@ public class EncryptionHelper {
         byte[] encryptedMessageBytes = encryptedMessage.getBytes(Charset.defaultCharset());
         String decrypted;
         try {
-            pgpDecryptionUtil = new PgpDecryptionUtil(reciever.getSecretKey(), password);
+            pgpDecryptionUtil = new PgpDecryptionUtil(reciever.getPrivateKey(), password);
+            byte[] decryptedBytes = pgpDecryptionUtil.decrypt(encryptedMessageBytes);
+            decrypted = new String(decryptedBytes, Charset.defaultCharset());
+            return decrypted;
+        } catch (IOException | PGPException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String decryptwithPrivateKey(String encryptedMessage, String server, String password) {
+        PgpDecryptionUtil pgpDecryptionUtil = null;
+        byte[] encryptedMessageBytes = encryptedMessage.getBytes(Charset.defaultCharset());
+        String decrypted;
+        byte[] _privateKeyStream = null;
+        try {
+            _privateKeyStream = IOUtils.toByteArray(new FileInputStream("keys\\ServerPrivateKey.asc"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            pgpDecryptionUtil = new PgpDecryptionUtil(_privateKeyStream, password);
             byte[] decryptedBytes = pgpDecryptionUtil.decrypt(encryptedMessageBytes);
             decrypted = new String(decryptedBytes, Charset.defaultCharset());
             return decrypted;

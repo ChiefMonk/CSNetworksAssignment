@@ -52,9 +52,24 @@ public class MessageProtocol implements Serializable {
             case SessionEnd -> {
                 encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
             }
-            case SystemUserAuth -> {
-                break;
+            case SystemUserAuth -> { // This should be server locked but then we need broadcast type
+                encryptedBodyString = EncryptionHelper.encryptwithPublicKey(bodyString, "server");
             }
+            case ValidateCertRequest -> // Done with public key as there is no "session" with server
+            {
+                encryptedBodyString = EncryptionHelper.encryptwithPublicKey(bodyString, receiver);
+            }
+            case ValidateCertResponse -> // Need to encrypt with server info
+            {
+                encryptedBodyString = bodyString;
+            }
+            case BroadcastUserList -> {
+                encryptedBodyString = bodyString; // No encryption for now
+            }
+            case Unknown -> {
+                encryptedBodyString = bodyString;
+            }
+
         }
         if (encryptedBodyString != null) {
             _cipherBody = encryptedBodyString;

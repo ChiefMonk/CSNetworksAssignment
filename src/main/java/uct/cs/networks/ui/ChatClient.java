@@ -25,6 +25,7 @@ import uct.cs.networks.messages.*;
 import uct.cs.networks.models.*;
 import uct.cs.networks.proto.*;
 import uct.cs.networks.utils.*;
+
 /**
  * The ChatClient is the main class for the Desktop Application.
  * 
@@ -58,8 +59,7 @@ public class ChatClient extends javax.swing.JFrame {
     private ObjectOutputStream _outputStream;
     private ObjectInputStream _inputStream;
 
-    private Socket _secureSocket;      
-
+    private Socket _secureSocket;
 
     /**
      * Creates new form ToolGUI
@@ -432,9 +432,9 @@ public class ChatClient extends javax.swing.JFrame {
     private void sendMessage(MessageProtocol message) {
         try {
             if (message == null)
-                return;  
-                       
-            _outputStream.writeObject(message);    
+                return;
+
+            _outputStream.writeObject(message);
             _outputStream.flush();
 
             _sendMessageIdList.add(message.getId());
@@ -465,9 +465,9 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (BroadcastSystemUsersMessage) messageBody.getMessage();
 
-                // if(!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest()))
-                // return;
+                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
+                    return;
+                }
 
                 appendTextAreaLive(actualMessage);
                 processUserList(actualMessage.getUserList());
@@ -481,9 +481,9 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionStartMessage) messageBody.getMessage();
 
-                // if(!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest()))
-                // return;
+                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
+                    return;
+                }
 
                 appendTextAreaLive(actualMessage);
                 // Add session key to user in userList
@@ -496,7 +496,7 @@ public class ChatClient extends javax.swing.JFrame {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                findByID(messageProtocol.getSender()).setSecretKey(key); // Find user
+                findByID(messageProtocol.getSender()).setSecretKey(key); // Find user and add key
 
             }
 
@@ -506,22 +506,25 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionEndMessage) messageBody.getMessage();
 
-                // if(!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest()))
-                // return;
+                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
+                    return;
+                }
 
                 appendTextAreaLive(actualMessage);
+                // Remove user from _listOfUsers
+                findByID(message.getSender()).removeSecretKey();
+
             }
 
             if (message.getType() == MessageType.ValidateCertResponse) {
-                // decrypt
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));// decrypt
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (ValidateCertMessageResponse) messageBody.getMessage();
 
-                // if(!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest()))
-                // return;
+                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
+                    return;
+                }
 
                 appendTextAreaLive(actualMessage);
             }
@@ -532,9 +535,9 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendTextMessage) messageBody.getMessage();
 
-                // if(!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest()))
-                // return;
+                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
+                    return;
+                }
 
                 appendTextAreaLive(actualMessage);
             }
@@ -545,9 +548,9 @@ public class ChatClient extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendImageWithTextMessage) messageBody.getMessage();
 
-                // if(!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest()))
-                // return;
+                if (!validateHashAgainstMessage(actualMessage, messageBody.getMessageDigest())) {
+                    return;
+                }
 
                 appendTextAreaLive(actualMessage);
                 setImageIconToLabel(byteArrayToImageIcon(actualMessage.getImageData()));
@@ -804,22 +807,17 @@ public class ChatClient extends javax.swing.JFrame {
         }
     }
 
-     
-   private void closeConnection()
-    {
-        try
-        {                         
-            _inputStream.close();                   
-             _outputStream.flush();                  
-             _outputStream.close();
+    private void closeConnection() {
+        try {
+            _inputStream.close();
+            _outputStream.flush();
+            _outputStream.close();
             _secureSocket.close();
-        }
-        catch (IOException ex) 
-        {
+        } catch (IOException ex) {
             logException(ex);
         }
-    }  
-       
+    }
+
     private void logException(Exception ex) {
 
         ex.printStackTrace();
@@ -933,7 +931,7 @@ public class ChatClient extends javax.swing.JFrame {
                 try {
                     Object object;
                     while ((object = _inputStream.readObject()) != null) {
-                        MessageProtocol message  = MessageFactory.getMessage(object);                    
+                        MessageProtocol message = MessageFactory.getMessage(object);
                         processReceivedMessage(message);
                     }
                 } catch (IOException e) {

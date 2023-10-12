@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.security.Security;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Base64;
 
 public class PgpDecryptionUtil {
 
@@ -44,6 +45,10 @@ public class PgpDecryptionUtil {
 
     public PgpDecryptionUtil(String privateKeyStr, String passCode) throws IOException, PGPException {
         this(IOUtils.toInputStream(privateKeyStr, Charset.defaultCharset()), passCode);
+    }
+
+    public PgpDecryptionUtil(byte[] privateKeyBtyeArray, String passCode) throws IOException, PGPException {
+        this(Base64.getEncoder().encodeToString(privateKeyBtyeArray), passCode);
     }
 
     private PGPPrivateKey findSecretKey(long keyID) throws PGPException {
