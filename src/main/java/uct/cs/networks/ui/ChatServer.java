@@ -19,6 +19,7 @@ import uct.cs.networks.proto.ProtocolBody;
 import uct.cs.networks.utils.CompressionHelper;
 import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
+import uct.cs.networks.utils.EncryptionHelper;
 
 /**
  * The ChatClientGUI is the main class for the Desktop Application.
@@ -36,20 +37,20 @@ public class ChatServer extends javax.swing.JFrame {
     private static final String TITLE = "- SecureChatSystem SERVER : Demonstrating Secure Network Communication with Cryptographic Functions -";
     private static final String ERROR_DEFAULT_TITLE = "Application Error Occurred";
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(20);
-    private static final int PORT_NUMBER = 4026;  
-    
+    private static final int PORT_NUMBER = 4026;
+
     private SystemUser _serverUser;
-    private ServerSocket _serverSocket = null;   
-    private Set<ChatClientHandler> _chatClientList = null;   
-  
+    private ServerSocket _serverSocket = null;
+    private Set<ChatClientHandler> _chatClientList = null;
+
     /**
      * Creates new form ToolGUI
      */
-    public ChatServer()  throws IOException {
+    public ChatServer() throws IOException {
         super(TITLE);
         initComponents();
         this.setTitle("<html><body><center>" + TITLE + "</center></body></html>");
-        this.setResizable(true);       
+        this.setResizable(true);
         this.setVisible(true);
 
         this.setDefaultCloseOperation(javax.swing.JFrame.DO_NOTHING_ON_CLOSE);
@@ -59,62 +60,56 @@ public class ChatServer extends javax.swing.JFrame {
                 ButtonExitApplicationActionPerformed(null);
             }
         });
-      
+
         loadServerUser();
-        _chatClientList = new HashSet<>(); 
-        _serverSocket = new ServerSocket(PORT_NUMBER);    
+        _chatClientList = new HashSet<>();
+        _serverSocket = new ServerSocket(PORT_NUMBER);
     }
-    
-    private void setCurrentTitle(String ipAddress)
-    {
+
+    private void setCurrentTitle(String ipAddress) {
         String t = TITLE;
-        if(ipAddress != null && !ipAddress.isBlank())
-             t = String.format("%s : Listening on %s:%s",  TITLE,ipAddress, PORT_NUMBER);
-        
+        if (ipAddress != null && !ipAddress.isBlank())
+            t = String.format("%s : Listening on %s:%s", TITLE, ipAddress, PORT_NUMBER);
+
         this.setTitle("<html><body><center>" + t + "</center></body></html>");
     }
-    
-    private void loadServerUser()
-    {
+
+    private void loadServerUser() {
         _serverUser = new SystemUser(HelperUtils.SERVER_ID, "The Server", "chatserver@cs.uct.ac.za", "chatserver001");
     }
-    
-    private String getIpAddress()
-    {
+
+    private String getIpAddress() {
         String ipAddress = null;
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            
-            while (networkInterfaces.hasMoreElements()) 
-            {
+
+            while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-               // System.out.println(networkInterface.getName());
+                // System.out.println(networkInterface.getName());
                 // Filter for Wi-Fi adapters (you can change this to suit your needs)
-                if (networkInterface.getName().startsWith("wlan") || networkInterface.getName().startsWith("eth")) 
-                {
+                if (networkInterface.getName().startsWith("wlan") || networkInterface.getName().startsWith("eth")) {
                     Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                                                           
+
                     while (inetAddresses.hasMoreElements()) {
-                        InetAddress inetAddress = inetAddresses.nextElement(); 
-                        //  System.out.println(inetAddress.getHostAddress());
+                        InetAddress inetAddress = inetAddresses.nextElement();
+                        // System.out.println(inetAddress.getHostAddress());
                         // Check for IPv4 addresses and exclude loopback address
-                        if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4 && inetAddress.getHostAddress().length() < 15) {   
+                        if (!inetAddress.isLoopbackAddress() && inetAddress.getAddress().length == 4
+                                && inetAddress.getHostAddress().length() < 15) {
                             ipAddress = inetAddress.getHostAddress();
-                           break;
+                            break;
                         }
                     }
                 }
-                
-                if(ipAddress != null)
+
+                if (ipAddress != null)
                     break;
             }
-        } 
-        catch (Exception e) 
-        {           
-           e.printStackTrace();
-           return "127.0.0.1";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "127.0.0.1";
         }
-        
+
         return ipAddress;
     }
 
@@ -125,7 +120,8 @@ public class ChatServer extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -138,19 +134,18 @@ public class ChatServer extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE));
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         PanelMain.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(204, 204, 204), 1, true));
 
-        PanelOutputExplanations.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
+        PanelOutputExplanations
+                .setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 204, 255)));
 
         TextAreaMain.setEditable(false);
         TextAreaMain.setColumns(20);
@@ -161,306 +156,255 @@ public class ChatServer extends javax.swing.JFrame {
         javax.swing.GroupLayout PanelOutputExplanationsLayout = new javax.swing.GroupLayout(PanelOutputExplanations);
         PanelOutputExplanations.setLayout(PanelOutputExplanationsLayout);
         PanelOutputExplanationsLayout.setHorizontalGroup(
-            PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1112, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1112, Short.MAX_VALUE)
+                                .addContainerGap()));
         PanelOutputExplanationsLayout.setVerticalGroup(
-            PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                PanelOutputExplanationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelOutputExplanationsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
+                                .addContainerGap()));
 
         javax.swing.GroupLayout PanelMainLayout = new javax.swing.GroupLayout(PanelMain);
         PanelMain.setLayout(PanelMainLayout);
         PanelMainLayout.setHorizontalGroup(
-            PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelMainLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelMainLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap()));
         PanelMainLayout.setVerticalGroup(
-            PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelMainLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                PanelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelMainLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(PanelOutputExplanations, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap()));
 
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(PanelMain, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, 0)));
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void start() throws IOException 
-    {            
+    private void start() throws IOException {
         setCurrentTitle(getIpAddress());
-        
-        while(true)
-        {
+
+        while (true) {
             Socket socket = _serverSocket.accept();
             ChatClientHandler client = new ChatClientHandler(socket);
             _chatClientList.add(client);
-           
-             threadPool.execute(client);          
-        }       
+
+            threadPool.execute(client);
+        }
     }
-    
-    private void broadcastMessage(MessageProtocol message) 
-    {           
-        for (ChatClientHandler client : _chatClientList) 
-        {
-            client.sendMessage(message);      
-        }            
+
+    private void broadcastMessage(MessageProtocol message) {
+        for (ChatClientHandler client : _chatClientList) {
+            client.sendMessage(message);
+        }
     }
-    
-    private void processReceivedMessage(ChatClientHandler client, Object messageObject) 
-    {   
-        if(messageObject == null)
+
+    private void processReceivedMessage(ChatClientHandler client, Object messageObject) {
+        if (messageObject == null)
             return;
-         
-        try
-        {      
+
+        try {
             MessageProtocol message = MessageFactory.getMessage(messageObject);
             appendInMessage(" =>:" + message.toServerString());
-            
+
             // Message if for the server
-            if(message.getType() == MessageType.SystemUserAuth)
-            {
+            if (message.getType() == MessageType.SystemUserAuth) {
                 var cipherBody = message.getCipherBody().toString();
-                // decrypt
+                cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, "server", "networks"); // decrypt
                 var plainBody = cipherBody;
-                       
+
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
-            
-                var actualMessage = (SystemUserAuthenticationMessage)messageBody.getMessage();                
-                client.setSystemUser(actualMessage.getUser());    
-                
-                MessageProtocol outMessage = MessageFactory.CreateBroadcastSystemUsersMessage(_serverUser, client.getSystemUser(), getAllSystemUsers());
+
+                var actualMessage = (SystemUserAuthenticationMessage) messageBody.getMessage();
+                client.setSystemUser(actualMessage.getUser());
+
+                MessageProtocol outMessage = MessageFactory.CreateBroadcastSystemUsersMessage(_serverUser,
+                        client.getSystemUser(), getAllSystemUsers());
                 broadcastMessage(outMessage);
+            } else {
+                broadcastMessage(message);
             }
-            else
-            {
-                broadcastMessage(message);     
-            }                                                   
+        } catch (IOException | ClassNotFoundException ex) {
+            logException(ex);
         }
-        catch (IOException | ClassNotFoundException ex) 
-        {
-             logException(ex);
-        }                        
     }
-    
-    private List<SystemUser> getAllSystemUsers()
-    {
+
+    private List<SystemUser> getAllSystemUsers() {
         List<SystemUser> users = new ArrayList<>();
-        
+
         users.add(_serverUser);
-        
-        for (ChatClientHandler client : _chatClientList) 
-        {
-            users.add(client.getSystemUser());      
-        } 
-        
+
+        for (ChatClientHandler client : _chatClientList) {
+            users.add(client.getSystemUser());
+        }
+
         return users;
     }
-            
-    private void closeServerSocket()
-    {
-        try
-        {
-           if(_serverSocket != null)
-            _serverSocket.close();  
-        }
-        catch (IOException ex) 
-        {
+
+    private void closeServerSocket() {
+        try {
+            if (_serverSocket != null)
+                _serverSocket.close();
+        } catch (IOException ex) {
             logException(ex);
-        }     
-    }
-    
-    private void closeAllClients()
-    {
-        try
-        {
-           if(_serverSocket != null)
-            _serverSocket.close();  
         }
-        catch (IOException ex) 
-        {
-            logException(ex);
-        }     
     }
-    
-    private class ChatClientHandler implements Runnable {   
+
+    private void closeAllClients() {
+        try {
+            if (_serverSocket != null)
+                _serverSocket.close();
+        } catch (IOException ex) {
+            logException(ex);
+        }
+    }
+
+    private class ChatClientHandler implements Runnable {
         private Socket _secureSocket;
         private ObjectOutputStream _outputStream;
         private ObjectInputStream _inputStream;
         private SystemUser _systemUser;
-        
-        public ChatClientHandler (Socket secureSocket)
-        {
+
+        public ChatClientHandler(Socket secureSocket) {
             _secureSocket = secureSocket;
-            
-            try
-            {               
-                _inputStream = new ObjectInputStream(new GZIPInputStream(_secureSocket.getInputStream()));       
-                _outputStream = new ObjectOutputStream (new GZIPOutputStream(_secureSocket.getOutputStream()));                     
+
+            try {
+                _inputStream = new ObjectInputStream(new GZIPInputStream(_secureSocket.getInputStream()));
+                _outputStream = new ObjectOutputStream(new GZIPOutputStream(_secureSocket.getOutputStream()));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            catch(IOException ex)
-            {
-                 logException(ex);
-            }             
         }
-        
+
         @Override
-        public void run()
-        {            
-            try
-            {
+        public void run() {
+            try {
                 Object messageObject;
-                while ((messageObject = _inputStream.readObject()) != null) {                 
-                    processReceivedMessage(this, messageObject);                   
+                while ((messageObject = _inputStream.readObject()) != null) {
+                    processReceivedMessage(this, messageObject);
                 }
-            }
-            catch (IOException | ClassNotFoundException ex) 
-            {
+            } catch (IOException | ClassNotFoundException ex) {
                 logException(ex);
-            }
-            finally
-            {
-                //removeClient();
-                //closeSocket();
+            } finally {
+                // removeClient();
+                // closeSocket();
             }
         }
-        
-        public void sendMessage(MessageProtocol message)
-        {           
-            try
-            {               
-               _outputStream.writeObject(message);  
-               _outputStream.flush();              
-            }
-            catch (IOException ex) 
-            {
+
+        public void sendMessage(MessageProtocol message) {
+            try {
+                _outputStream.writeObject(message);
+                _outputStream.flush();
+            } catch (IOException ex) {
                 logException(ex);
-            }              
+            }
         }
-        
-        public void setSystemUser(SystemUser systemUser)
-        {
+
+        public void setSystemUser(SystemUser systemUser) {
             _systemUser = systemUser;
         }
-        
-        public SystemUser getSystemUser()
-        {
+
+        public SystemUser getSystemUser() {
             return _systemUser;
         }
-               
-        private void removeClient()
-        {
+
+        private void removeClient() {
             closeSocket();
             _chatClientList.remove(this);
         }
-        
-        private void closeSocket()
-        {
-            try
-            {                         
+
+        private void closeSocket() {
+            try {
                 _inputStream.close();
-                   
-                 _outputStream.flush();                  
-                 _outputStream.close();
-                 
+
+                _outputStream.flush();
+                _outputStream.close();
+
                 _secureSocket.close();
-            }
-            catch (IOException ex) 
-            {
+            } catch (IOException ex) {
                 logException(ex);
             }
-        }        
+        }
     }
-    
-     private void ButtonExitApplicationActionPerformed() 
-     {
+
+    private void ButtonExitApplicationActionPerformed() {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",
                 "Exit the Application", JOptionPane.YES_NO_OPTION);
-        if (reply == JOptionPane.YES_OPTION) 
-        {
+        if (reply == JOptionPane.YES_OPTION) {
             closeAllClients();
             closeServerSocket();
             System.exit(0);
         }
     }
-     
-     private void appendInMessage(String message)
-     {
-        if(message == null || message.isBlank())
+
+    private void appendInMessage(String message) {
+        if (message == null || message.isBlank())
             return;
-        
-        String m = String.format(" IN: %s\n", message);         
+
+        String m = String.format(" IN: %s\n", message);
         TextAreaMain.append(m);
-        System.out.println(m);   
+        System.out.println(m);
         logInfor(m);
-     }
-     
-     private void appendInMessage(IMessage message)
-     {
-          if(message == null)
-            return;
-          
-       appendInMessage(message.toServerString());   
-       logInfor(message.toServerString());
-     }
-     
-     private void appendOutMessage(String message)
-     {
-        if(message == null || message.isBlank())
-            return;
-        
-        String m = String.format(" OUT: %s\n", message);         
-        TextAreaMain.append(m);
-        System.out.println(m);     
-        logInfor(m);
-     }
-     
-     private void appendOutMessage(IMessage message)
-     {
-          if(message == null)
-            return;
-          
-       appendOutMessage(message.toServerString());   
-       logInfor(message.toServerString());
-     }
-     
-    private void logException(Exception ex)
-    {
-          ex.printStackTrace();
-          Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
     }
-    
-    private void logInfor(String info)
-    {         
+
+    private void appendInMessage(IMessage message) {
+        if (message == null)
+            return;
+
+        appendInMessage(message.toServerString());
+        logInfor(message.toServerString());
+    }
+
+    private void appendOutMessage(String message) {
+        if (message == null || message.isBlank())
+            return;
+
+        String m = String.format(" OUT: %s\n", message);
+        TextAreaMain.append(m);
+        System.out.println(m);
+        logInfor(m);
+    }
+
+    private void appendOutMessage(IMessage message) {
+        if (message == null)
+            return;
+
+        appendOutMessage(message.toServerString());
+        logInfor(message.toServerString());
+    }
+
+    private void logException(Exception ex) {
+        ex.printStackTrace();
+        Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+    }
+
+    private void logInfor(String info) {
         Logger.getLogger(getClass().getName()).log(Level.INFO, info);
     }
-   
+
     private void ButtonExitApplicationActionPerformed(java.awt.event.ActionEvent evt) {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",
                 "Exit the Application", JOptionPane.YES_NO_OPTION);
@@ -472,7 +416,7 @@ public class ChatServer extends javax.swing.JFrame {
     private void processReceivedMessage(IMessage message) {
         if (message == null)
             return;
-       
+
     }
     // </editor-fold>
 
@@ -514,7 +458,6 @@ public class ChatServer extends javax.swing.JFrame {
 
     // </editor-fold>
 
-    
     /**
      * @param args the command line arguments
      */
@@ -556,12 +499,9 @@ public class ChatServer extends javax.swing.JFrame {
         // </editor-fold>
 
         /* Create and display the form */
-        try
-        {
+        try {
             new ChatServer().start();
-        }
-        catch (IOException ex) 
-        {
+        } catch (IOException ex) {
             Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
