@@ -53,6 +53,18 @@
     </build>
     
     <dependencies>  
+        
+        <dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcpg-jdk15on</artifactId>
+    <version>1.68</version> <!-- Update to the latest version if needed -->
+</dependency>
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.12.0</version> <!-- Update to the latest version if needed -->
+</dependency>
+
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
@@ -71,6 +83,11 @@
     <artifactId>bcpg-jdk15on</artifactId>
     <version>1.70</version>
     <scope>compile</scope>
+</dependency>
+<dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
 </dependency>
 
 <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on -->

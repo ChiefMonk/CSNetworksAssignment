@@ -7,8 +7,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 import javax.swing.JOptionPane;
 import uct.cs.networks.enums.MessageType;
 import uct.cs.networks.interfaces.IMessage;
@@ -16,10 +14,8 @@ import uct.cs.networks.messages.*;
 import uct.cs.networks.models.SystemUser;
 import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
-import uct.cs.networks.utils.CompressionHelper;
 import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.utils.MessageFactory;
-import uct.cs.networks.utils.EncryptionHelper;
 
 /**
  * The ChatClientGUI is the main class for the Desktop Application.
@@ -75,7 +71,7 @@ public class ChatServer extends javax.swing.JFrame {
     }
 
     private void loadServerUser() {
-        _serverUser = new SystemUser(HelperUtils.SERVER_ID, "The Server", "chatserver@cs.uct.ac.za", "chatserver001");
+        _serverUser = SystemUser.createServerUser();
     }
 
     private String getIpAddress() {

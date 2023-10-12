@@ -18,8 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 import uct.cs.networks.enums.*;
 import uct.cs.networks.messages.*;
 import uct.cs.networks.models.*;
@@ -420,7 +418,7 @@ public class ChatClient extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private SystemUser findByID(String id) {
+    private SystemUser findUserByID(String id) {
         System.out.println("Looking for: " + id);
         for (SystemUser user : _listOfUsers.values()) {
             System.out.println(user.getId());
@@ -503,12 +501,11 @@ public class ChatClient extends javax.swing.JFrame {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                findByID(message.getSender()).setSecretKey(key); // Find user and add key
-
+                findUserByID(message.getSender()).setSecretKey(key); // Find user and add key
             }
 
             if (message.getType() == MessageType.SessionEnd) {
-                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionEndMessage) messageBody.getMessage();
@@ -520,12 +517,12 @@ public class ChatClient extends javax.swing.JFrame {
 
                 appendTextAreaLive(actualMessage);
                 // Remove user from _listOfUsers
-                findByID(message.getSender()).removeSecretKey();
+                findUserByID(message.getSender()).removeSecretKey();
 
             }
 
             if (message.getType() == MessageType.ValidateCertResponse) {
-                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));// decrypt
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));// decrypt
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (ValidateCertMessageResponse) messageBody.getMessage();
@@ -554,7 +551,7 @@ public class ChatClient extends javax.swing.JFrame {
             }
 
             if (message.getType() == MessageType.SendImageWithText) {
-                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findByID(message.getSender()));
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendImageWithTextMessage) messageBody.getMessage();
@@ -793,7 +790,7 @@ public class ChatClient extends javax.swing.JFrame {
         authForm.dispose();
 
         if (authUser != null) {
-            _currentUser = new SystemUser(authUser);
+            _currentUser = SystemUser.createClientUser(authUser);
             _passPhrase = authUser.getKeyPassphrase();
             _ipAddress = authUser.getServerIpAddress();
             _portNumber = authUser.getPortNumber();
