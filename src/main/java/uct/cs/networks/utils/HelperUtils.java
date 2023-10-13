@@ -1,10 +1,15 @@
 package uct.cs.networks.utils;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.Key;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
@@ -12,6 +17,7 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uct.cs.networks.models.SystemUserNew;
 import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
 
@@ -77,5 +83,34 @@ public class HelperUtils {
             obj = objectInputStream.readObject();
         }
         return obj;
+    }
+
+    public static String convertSystemUserNew2String(SystemUserNew sysUser) throws IOException {
+        return convertObjectToBase64String(sysUser);
+    }
+
+    public static SystemUserNew convertBase64StringToSystemUserNew(String base64String)
+            throws IOException, ClassNotFoundException {
+        Object obj = convertBase64StringToObject(base64String);
+        return (SystemUserNew) obj;
+    }
+
+    public static String byteArray2String(byte[] arr) {
+        InputStream inputStream = new ByteArrayInputStream(arr);
+        String result = "nothing";
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append(System.lineSeparator()); // Add line separator if needed
+            }
+            result = stringBuilder.toString();
+            // System.out.println(result);
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

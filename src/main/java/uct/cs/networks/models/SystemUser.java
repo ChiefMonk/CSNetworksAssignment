@@ -95,28 +95,25 @@ public class SystemUser implements Serializable {
             e.printStackTrace();
         }
     }
-    
-     public SystemUser cloneForSharing()
-    {
+
+    public SystemUser cloneForSharing() {
         return new SystemUser(getId(), getName(), getEmailAddress(), getPublicKey());
     }
-    
-     public static SystemUser createClientUser(SystemUserAuthentication authUser)
-    {      
-         return new SystemUser(authUser);                  
+
+    public static SystemUser createClientUser(SystemUserAuthentication authUser) {
+        return new SystemUser(authUser);
     }
-    
-    public static SystemUser createServerUser()
-    {
+
+    public static SystemUser createServerUser() {
         String id = HelperUtils.SERVER_ID;
         String name = "The Server";
         String email = "chatserver@cs.uct.ac.za";
         String password = "chatserver001";
-                
-         return new SystemUser(
-                 id, 
-                 name, 
-                 email, 
-                 password);                         
+
+        return new SystemUser(
+                id,
+                name,
+                email,
+                password);
     }
 }

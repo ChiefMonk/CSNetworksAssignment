@@ -453,7 +453,7 @@ public class ChatClient extends javax.swing.JFrame {
 
         try {
             MessageProtocol message = MessageFactory.getMessage(messageObject);
-            System.out.println("TestProcessonCLient" + message.getSender() + "->" + message.getReceiver());
+            System.out.println("TestProcessonCLient: " + message.getSender() + " => " + message.getReceiver());
             appendTextAreaOutputLogs(message);
 
             _receivedMessageIdList.add(message.getId());
@@ -476,8 +476,8 @@ public class ChatClient extends javax.swing.JFrame {
             }
 
             if (message.getType() == MessageType.SessionStart) {
-                // cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser,
-                // _passPhrase); // decrypt
+                cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser,
+                        _passPhrase); // decrypt
                 var plainBody = cipherBody;
                 // MessageProtocol messageProtocol = (MessageProtocol) HelperUtils ->> Lets just
                 // use message above
@@ -490,7 +490,7 @@ public class ChatClient extends javax.swing.JFrame {
                 // return;
                 // }
 
-                appendTextAreaLive(actualMessage);
+                appendTextAreaLive(actualMessage + "Decryption Worked");
                 // Add session key to user in userList
                 AESEncryption aesEncryption = new AESEncryption();
                 String key = null;
@@ -593,8 +593,16 @@ public class ChatClient extends javax.swing.JFrame {
 
         if (userList == null || userList.isEmpty())
             return;
-
+        System.out.println("In ProcessUserList");
         for (SystemUser user : userList) {
+            String pubKey = "nothing yet";
+            try {
+                pubKey = HelperUtils.byteArray2String(user.getPublicKey());// new String(user.getPublicKey(),
+                                                                           // "StandardCharsets.UTF_8");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(user.getName() + " " + pubKey);
             if (user.getId().equals(HelperUtils.SERVER_ID)) {
                 RadioUserServer.setVisible(true);
                 RadioUserServer.setText(user.getName());

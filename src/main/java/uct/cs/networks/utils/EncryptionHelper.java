@@ -1,7 +1,9 @@
 package uct.cs.networks.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -36,8 +38,10 @@ public class EncryptionHelper {
                 .withIntegrityCheck(true)
                 .build();
         try {
+            byte[] publicKeyasByte = receiver.getPublicKey();
+            InputStream publicKeyInputStream = new ByteArrayInputStream(publicKeyasByte);
             byte[] encryptedBytes = pgpEncryptionUtil.encrypt(message.getBytes(Charset.defaultCharset()),
-                    receiver.getPublicKey()); // Needs to be as an input stream
+                    publicKeyInputStream); // Needs to be as an input stream
             return ByteArray2String(encryptedBytes);
         } catch (Exception e) {
             e.printStackTrace();

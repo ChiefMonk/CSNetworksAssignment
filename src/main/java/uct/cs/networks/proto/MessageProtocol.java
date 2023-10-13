@@ -2,6 +2,8 @@ package uct.cs.networks.proto;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+
 import uct.cs.networks.enums.MessageType;
 import uct.cs.networks.interfaces.IMessage;
 import uct.cs.networks.utils.EncryptionHelper;
@@ -41,7 +43,11 @@ public class MessageProtocol implements Serializable {
 
         switch (message.getType()) {
             case SessionStart -> {
-                encryptedBodyString = bodyString; // EncryptionHelper.encryptwithPublicKey(bodyString, receiver);
+                System.out.println("Starting Encryption");
+                System.out.println(receiver.getName());
+                System.out.println(HelperUtils.byteArray2String(receiver.getPublicKey()));
+                encryptedBodyString = EncryptionHelper.encryptwithPublicKey(bodyString, receiver);
+                System.out.println("Finished Encryption");
             }
             case SendText -> {
                 encryptedBodyString = bodyString;// EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
