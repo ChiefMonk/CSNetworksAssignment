@@ -1,4 +1,0 @@
-Hey everyone. Created a RSA public and private key for the server. The details are below:
-
-Identity: "server"
-PassPhrase: "networks"server
