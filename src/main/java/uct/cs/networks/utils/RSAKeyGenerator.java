@@ -155,6 +155,9 @@ public class RSAKeyGenerator {
                 FileOutputStream out1 = new FileOutputStream(privateKeyFile);
                 FileOutputStream out2 = new FileOutputStream(publicKeyFile);
                 generateAndExportKeyRing(out1, out2, identity, passPhrase.toCharArray(), true);
+                
+                out1.close();
+                out2.close();
             }
         } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | PGPException ex) {
             Logger.getLogger(RSAKeyGenerator.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
