@@ -868,8 +868,20 @@ public class ChatClient extends javax.swing.JFrame {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",
                 "Exit the Application", JOptionPane.YES_NO_OPTION);
         if (reply == JOptionPane.YES_OPTION) {
-            closeConnection();
-            System.exit(0);
+            try
+            {
+                closeConnection(); 
+            }
+            catch(Exception ex)
+            {
+                logException(ex);
+            }
+            finally
+            {
+               System.exit(0);
+            }
+           
+            System.exit(0);        
         }
     }
 
@@ -1005,16 +1017,16 @@ public class ChatClient extends javax.swing.JFrame {
                         System.out.println("New incoming message");
                         processReceivedMessage(message);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ex) {
+                    logException(ex);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+                   logException(ex);
                 }
             });
             receiveThread.start();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            logException(ex);
         }
     }
 
