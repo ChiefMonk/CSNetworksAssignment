@@ -61,6 +61,9 @@ public class SystemUser implements Serializable {
     }
 
     public String getName() {
+        
+        if(_name == null)
+            return "Name";
         return _name;
     }
 

@@ -58,6 +58,10 @@ public class HelperUtils {
 
     public static ProtocolBody convertBase64StringToProtocolBody(String base64String)
             throws IOException, ClassNotFoundException {
+        
+         if(base64String == null)
+            return null;
+         
         Object obj = convertBase64StringToObject(base64String);
         return (ProtocolBody) obj;
     }
@@ -85,7 +89,10 @@ public class HelperUtils {
         return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
     }
 
-    public static Object convertBase64StringToObject(String base64String) throws IOException, ClassNotFoundException {
+    public static Object convertBase64StringToObject(String base64String) throws IOException, ClassNotFoundException {        
+        if(base64String == null)
+            return null;
+        
         byte[] data = Base64.getDecoder().decode(base64String);
         Object obj;
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(data))) {

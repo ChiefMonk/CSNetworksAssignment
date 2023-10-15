@@ -32,7 +32,7 @@ public class ChatServer extends javax.swing.JFrame {
 
     private static final String TITLE = "- SecureChatSystem SERVER : Demonstrating Secure Network Communication with Cryptographic Functions -";
     private static final String ERROR_DEFAULT_TITLE = "Application Error Occurred";
-    private static final ExecutorService threadPool = Executors.newFixedThreadPool(20);
+    private static final ExecutorService threadPool = Executors.newFixedThreadPool(100);
     private static final int PORT_NUMBER = 4026;
 
     private SystemUser _serverUser;
@@ -207,7 +207,6 @@ public class ChatServer extends javax.swing.JFrame {
             Socket socket = _serverSocket.accept();
             ChatClientHandler client = new ChatClientHandler(socket);
             _chatClientList.add(client);
-
             threadPool.execute(client);
         }
     }
@@ -216,7 +215,7 @@ public class ChatServer extends javax.swing.JFrame {
         for (ChatClientHandler client : _chatClientList) {
             System.out.println("Testing if client is closed");
             client.isClosed();
-            System.out.println("Server broadcasting to: " + client.getSystemUser().getName());
+           // System.out.println("Server broadcasting to: " + client.getSystemUser().getName());
             client.sendMessage(message);
         }
     }

@@ -496,6 +496,9 @@ public class ChatClient extends javax.swing.JFrame {
                 // use message above
                 // .convertBase64StringToMessageProtocol(message);
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                  if(messageBody == null)
+                    return;
+                  
                 var actualMessage = (SessionStartMessage) messageBody.getMessage();
                 // boolean isRightHash =
                 if (!validateHashAgainstMessage(actualMessage,
@@ -529,6 +532,10 @@ public class ChatClient extends javax.swing.JFrame {
                 cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                
+                if(messageBody == null)
+                    return;
+                
                 var actualMessage = (SessionEndMessage) messageBody.getMessage();
 
                 // if (!validateHashAgainstMessage(actualMessage,
@@ -546,6 +553,10 @@ public class ChatClient extends javax.swing.JFrame {
                 cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));// decrypt
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                
+                  if(messageBody == null)
+                    return;
+                  
                 var actualMessage = (ValidateCertMessageResponse) messageBody.getMessage();
 
                 // if (!validateHashAgainstMessage(actualMessage,
@@ -560,6 +571,10 @@ public class ChatClient extends javax.swing.JFrame {
                 cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                
+                  if(messageBody == null)
+                    return;
+                  
                 var actualMessage = (SendTextMessage) messageBody.getMessage();
 
                 if (!validateHashAgainstMessage(actualMessage,
@@ -573,10 +588,13 @@ public class ChatClient extends javax.swing.JFrame {
             }
 
             if (message.getType() == MessageType.SendImageWithText) {
-                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody,
-                        findUserByID(message.getSender()));
+                //cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody,                         findUserByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
+                  if(messageBody == null)
+                    return;
+                  
+                
                 var actualMessage = (SendImageWithTextMessage) messageBody.getMessage();
 
                 if (!validateHashAgainstMessage(actualMessage,
@@ -928,8 +946,10 @@ public class ChatClient extends javax.swing.JFrame {
     }
 
     private void appendTextAreaLive(IMessage message) {
-        if (message == null)
+        if (message == null || message.getReceiver() != _currentUser.getId())
+        {           
             return;
+        }
 
         appendTextAreaLive(message.toClientString());
     }
