@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 import uct.cs.networks.enums.MessageType;
 import uct.cs.networks.interfaces.IMessage;
+import uct.cs.networks.utils.AESEncryption;
 import uct.cs.networks.utils.EncryptionHelper;
 import uct.cs.networks.utils.HelperUtils;
 import uct.cs.networks.models.SystemUser;
@@ -43,14 +44,17 @@ public class MessageProtocol implements Serializable {
 
         switch (message.getType()) {
             case SessionStart -> {
+                AESEncryption aesEncryption = new AESEncryption();
                 System.out.println("Starting Encryption");
                 System.out.println(receiver.getName());
                 System.out.println(HelperUtils.byteArray2String(receiver.getPublicKey()));
                 encryptedBodyString = EncryptionHelper.encryptwithPublicKey(bodyString, receiver);
+                System.out.println("original: " + bodyString);
+                System.out.println("Encrypte:" + encryptedBodyString);
                 System.out.println("Finished Encryption");
             }
             case SendText -> {
-                encryptedBodyString = bodyString;// EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
+                encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);
             }
             case SendImageWithText -> {
                 encryptedBodyString = EncryptionHelper.encryptWithSharedKey(bodyString, receiver);

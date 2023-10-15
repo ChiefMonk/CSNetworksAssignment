@@ -61,8 +61,11 @@ public class PgpDecryptionUtil {
     public void decrypt(InputStream encryptedIn, OutputStream clearOut)
             throws PGPException, IOException {
         // Removing armour and returning the underlying binary encrypted stream
+        System.out.println("pgpDecryp A");
         encryptedIn = PGPUtil.getDecoderStream(encryptedIn);
+        System.out.println("pgpDecryp B");
         JcaPGPObjectFactory pgpObjectFactory = new JcaPGPObjectFactory(encryptedIn);
+        System.out.println("pgpDecryp C");
 
         Object obj = pgpObjectFactory.nextObject();
         // The first object might be a marker packet

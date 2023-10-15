@@ -62,6 +62,15 @@ public class HelperUtils {
         return (ProtocolBody) obj;
     }
 
+    public static String convertKeytoBase64String(Key key) throws IOException {
+        return convertObjectToBase64String(key);
+    }
+
+    public static Key convertBase64toKey(String base54String) throws IOException, ClassNotFoundException {
+        Object obj = convertBase64StringToObject(base54String);
+        return (Key) obj;
+    }
+
     public static MessageProtocol convertBase64StringToMessageProtocol(String base64String)
             throws IOException, ClassNotFoundException {
         Object obj = convertBase64StringToObject(base64String);

@@ -44,7 +44,7 @@ public class MessageFactory {
         return new MessageProtocol(new ValidateCertMessageRequest(sender, receiver, verifyUser), false, null);
     }
 
-    private static Key createSharedKey() {
+    public static Key createSharedKey() {
         AESEncryption aesEncryption = new AESEncryption();
         Key key = null;
         try {
@@ -56,7 +56,7 @@ public class MessageFactory {
     }
 
     public static MessageProtocol CreateMessage(SystemUser sender, SystemUser receiver, MessageType type,
-            byte[] imageData, String textData) throws IOException {
+            byte[] imageData, String textData, Key key) throws IOException {
         IMessage message = null;
         boolean createHash = true;
         switch (type) {
@@ -72,8 +72,8 @@ public class MessageFactory {
             }
 
             case SessionStart -> {
-                message = new SessionStartMessage(sender, receiver, createSharedKey());
-                createHash = false;
+                message = new SessionStartMessage(sender, receiver, key);// createSharedKey());
+                createHash = true;
                 break;
             }
 

@@ -72,6 +72,12 @@ public class SystemUser implements Serializable {
         return _publicKeyStream;
     }
 
+    public Boolean hasSharedKey() {
+        System.out.println("This is the shared key:");
+        System.out.println(this._secretKey);
+        return (this._secretKey != null);
+    }
+
     public void removeSecretKey() {
         this._secretKey = null;
     }
@@ -90,7 +96,7 @@ public class SystemUser implements Serializable {
 
     private void setPrivateKey() {
         try {
-            _privateKeyStream = IOUtils.toByteArray(new FileInputStream(_publicKey));
+            _privateKeyStream = IOUtils.toByteArray(new FileInputStream(_privateKey));
         } catch (Exception e) {
             e.printStackTrace();
         }
