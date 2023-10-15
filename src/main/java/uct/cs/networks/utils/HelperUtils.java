@@ -16,8 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uct.cs.networks.models.SystemUser;
 
-import uct.cs.networks.models.SystemUserNew;
 import uct.cs.networks.proto.MessageProtocol;
 import uct.cs.networks.proto.ProtocolBody;
 
@@ -62,6 +62,15 @@ public class HelperUtils {
         return (ProtocolBody) obj;
     }
 
+    public static String convertKeytoBase64String(Key key) throws IOException {
+        return convertObjectToBase64String(key);
+    }
+
+    public static Key convertBase64toKey(String base54String) throws IOException, ClassNotFoundException {
+        Object obj = convertBase64StringToObject(base54String);
+        return (Key) obj;
+    }
+
     public static MessageProtocol convertBase64StringToMessageProtocol(String base64String)
             throws IOException, ClassNotFoundException {
         Object obj = convertBase64StringToObject(base64String);
@@ -85,14 +94,14 @@ public class HelperUtils {
         return obj;
     }
 
-    public static String convertSystemUserNew2String(SystemUserNew sysUser) throws IOException {
+    public static String convertSystemUserNew2String(SystemUser sysUser) throws IOException {
         return convertObjectToBase64String(sysUser);
     }
 
-    public static SystemUserNew convertBase64StringToSystemUserNew(String base64String)
+    public static SystemUser convertBase64StringToSystemUserNew(String base64String)
             throws IOException, ClassNotFoundException {
         Object obj = convertBase64StringToObject(base64String);
-        return (SystemUserNew) obj;
+        return (SystemUser) obj;
     }
 
     public static String byteArray2String(byte[] arr) {

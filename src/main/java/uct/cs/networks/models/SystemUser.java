@@ -15,9 +15,11 @@ import uct.cs.networks.utils.*;
  */
 
 public class SystemUser implements Serializable {
+    private static final String keysFolder = "keys";
     private final String _id;
     private final String _name;
     private final String _emailAddress;
+    private String _password;
     private String _secretKey;
     private String _publicKey; // file path to key
     private String _privateKey;
@@ -32,11 +34,17 @@ public class SystemUser implements Serializable {
         _id = id;
         _name = name;
         _emailAddress = emailAddress;
+        _password = password;
+        _privateKey = String.format("%s\\%s_prv.asc", keysFolder, id);
+        _publicKey = String.format("%s\\%s_pub.asc", keysFolder, id);
+        
         // Create new SystemUser with private and public key
         RSAKeyGenerator keyGenerator = new RSAKeyGenerator();
-        keyGenerator.createKeys(name, password); // will create keys in path below
-        _publicKey = "keys\\UserPublicKey.asc";
-        _privateKey = "keys\\UserPrivateKey.asc";
+        keyGenerator.createKeys(_privateKey, _publicKey, name, password); // will create keys in path below
+        //_publicKey = "keys\\UserPublicKey.asc";
+       // _privateKey = "keys\\UserPrivateKey.asc";
+     
+        
         setPublicKey();
         setPrivateKey();
     }
@@ -72,6 +80,12 @@ public class SystemUser implements Serializable {
         return _publicKeyStream;
     }
 
+    public Boolean hasSharedKey() {
+        System.out.println("This is the shared key:");
+        System.out.println(this._secretKey);
+        return (this._secretKey != null);
+    }
+
     public void removeSecretKey() {
         this._secretKey = null;
     }
@@ -90,7 +104,7 @@ public class SystemUser implements Serializable {
 
     private void setPrivateKey() {
         try {
-            _privateKeyStream = IOUtils.toByteArray(new FileInputStream(_publicKey));
+            _privateKeyStream = IOUtils.toByteArray(new FileInputStream(_privateKey));
         } catch (Exception e) {
             e.printStackTrace();
         }

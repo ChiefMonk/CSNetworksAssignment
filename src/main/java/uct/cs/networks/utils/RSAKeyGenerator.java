@@ -137,10 +137,10 @@ public class RSAKeyGenerator {
     }
 
     private static final String keysFolder = "keys";
-    private static final String privateKeyFile = "keys\\UserPrivateKey.asc";
-    private static final String publicKeyFile = "keys\\UserPublicKey.asc";
+   // private static final String privateKeyFile = "keys\\UserPrivateKey.asc";
+   // private static final String publicKeyFile = "keys\\UserPublicKey.asc";
 
-    public static void createKeys(String identity, String passPhrase) {
+    public static void createKeys(String privateKeyFile, String publicKeyFile, String identity, String passPhrase) {
         try {
             createKeysFolder();
 
@@ -169,7 +169,7 @@ public class RSAKeyGenerator {
         file.mkdir();
     }
 
-    private static boolean checkIfBothKeysExist() {
+   private static boolean checkIfBothKeysExist(String privateKeyFile, String publicKeyFile) {
         File priFile = new File(privateKeyFile);
         File pubFile = new File(publicKeyFile);
 
@@ -179,7 +179,7 @@ public class RSAKeyGenerator {
     public static void main(String[] args) throws Exception {
         String identity = "server";
         String passPhrase = "networks";
-        createKeys(identity, passPhrase);
+       // createKeys(identity, passPhrase);
 
     }
 }

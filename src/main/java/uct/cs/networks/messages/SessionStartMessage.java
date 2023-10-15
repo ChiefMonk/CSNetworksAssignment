@@ -26,25 +26,32 @@ public class SessionStartMessage extends MessageBase implements IMessage {
 
     public SessionStartMessage(SystemUser sender, SystemUser receiver, Key key) {
         super(MessageType.SessionStart, sender, receiver);
-        sessionKey = key;
-        /*
-         * AESEncryption aesEncryption = new AESEncryption();
-         * //Key key;
-         * try {
-         * key = aesEncryption.getKeyFromKeyGenerator();
-         * this.sessionKey = key;
-         * // Create new messageBody and update original
-         * // MessageBody newBody = new MessageBody("Incoming chat with " +
-         * receiver.getName(), key);
-         * //setBody(newBody);
-         * } catch (Exception e) {
-         * e.printStackTrace();
-         * }
-         */
+        this.sessionKey = key;
+
+        AESEncryption aesEncryption = new AESEncryption();
+        // Key key;
+        // try {
+        // key = aesEncryption.getKeyFromKeyGenerator();
+        // this.sessionKey = key;
+        // System.out.println("Secret key:");
+        // System.out.println(HelperUtils.byteArray2String(key.getEncoded()));
+        // System.out.println(aesEncryption.serializeKeyToString(key) + "(shared key)");
+
+        // Create new messageBody and update original
+        // MessageBody newBody = new MessageBody("Incoming chat with " +
+        // setBody(newBody);
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+
     }
 
     public Key getSessionKey() {
         return sessionKey;
+    }
+
+    public String getRecieverID() {
+        return super.getReceiver();
     }
 
     /**

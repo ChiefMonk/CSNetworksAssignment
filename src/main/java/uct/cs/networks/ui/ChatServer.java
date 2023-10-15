@@ -214,6 +214,9 @@ public class ChatServer extends javax.swing.JFrame {
 
     private void broadcastMessage(MessageProtocol message) {
         for (ChatClientHandler client : _chatClientList) {
+            System.out.println("Testing if client is closed");
+            client.isClosed();
+            System.out.println("Server broadcasting to: " + client.getSystemUser().getName());
             client.sendMessage(message);
         }
     }
@@ -236,8 +239,10 @@ public class ChatServer extends javax.swing.JFrame {
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
 
                 var actualMessage = (SystemUserAuthenticationMessage) messageBody.getMessage();
-                System.out.println("actualMessage" + actualMessage);
+                System.out.println("actualMessage" + actualMessage.toClientString());
                 client.setSystemUser(actualMessage.getUser());
+                System.out.println(client.getSystemUser().getName());
+                System.out.println(HelperUtils.byteArray2String(client.getSystemUser().getPublicKey()));
 
                 MessageProtocol outMessage = MessageFactory.CreateBroadcastSystemUsersMessage(_serverUser,
                         client.getSystemUser(), getAllSystemUsers());
@@ -300,6 +305,11 @@ public class ChatServer extends javax.swing.JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        public void isClosed() {
+           // String result = _systemUser.getName() + " - " + _secureSocket.isClosed();
+           // System.out.println(result);
         }
 
         @Override

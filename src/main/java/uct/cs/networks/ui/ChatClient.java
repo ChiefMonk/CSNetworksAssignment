@@ -3,6 +3,7 @@ package uct.cs.networks.ui;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.security.Key;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Image;
@@ -10,6 +11,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.bouncycastle.math.ec.WNafL2RMultiplier;
+
 import uct.cs.networks.interfaces.IMessage;
 import java.io.*;
 import java.net.Socket;
@@ -429,6 +433,13 @@ public class ChatClient extends javax.swing.JFrame {
         return null;
     }
 
+    private void viewListOfUsers() {
+        System.out.println("Viewing current state of user list:");
+        for (SystemUser user : _listOfUsers.values()) {
+            System.out.println(user.getName() + " - " + user.getSecretKey());
+        }
+    }
+
     private void sendMessage(MessageProtocol message) {
         try {
             if (message == null)
@@ -453,7 +464,8 @@ public class ChatClient extends javax.swing.JFrame {
 
         try {
             MessageProtocol message = MessageFactory.getMessage(messageObject);
-            System.out.println("TestProcessonCLient: " + message.getSender() + " => " + message.getReceiver());
+            System.out.println("TestProcessonCLient: " + findUserByID(message.getSender()) + " => "
+                    + findUserByID(message.getReceiver()));
             appendTextAreaOutputLogs(message);
 
             _receivedMessageIdList.add(message.getId());
@@ -476,32 +488,41 @@ public class ChatClient extends javax.swing.JFrame {
             }
 
             if (message.getType() == MessageType.SessionStart) {
-                cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser,
-                        _passPhrase); // decrypt
+                // System.out.println("Print out encrypted recieved cipherbody: " + cipherBody);
+                cipherBody = EncryptionHelper.decryptwithPrivateKey(cipherBody, _currentUser, _passPhrase); // decrypt
+                System.out.println(cipherBody);
                 var plainBody = cipherBody;
                 // MessageProtocol messageProtocol = (MessageProtocol) HelperUtils ->> Lets just
                 // use message above
                 // .convertBase64StringToMessageProtocol(message);
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SessionStartMessage) messageBody.getMessage();
-
-                // if (!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest())) {
-                // return;
-                // }
-
+                // boolean isRightHash =
+                if (!validateHashAgainstMessage(actualMessage,
+                        messageBody.getMessageDigest())) {
+                    System.out.println("Comparing Hashes");
+                    return;
+                } else {
+                    System.out.println("Hashing Worked");
+                }
+                System.out.println("Process on Client Side:");
+                System.out.println(HelperUtils.byteArray2String(actualMessage.getSessionKey().getEncoded()));
+                // System.out.println()
                 appendTextAreaLive(actualMessage + "Decryption Worked");
                 // Add session key to user in userList
                 AESEncryption aesEncryption = new AESEncryption();
                 String key = null;
                 try {
-                    key = aesEncryption.serializeKeyToString(actualMessage.getSessionKey()); // add session key from
-                                                                                             // actual message
+                    key = HelperUtils.convertKeytoBase64String(actualMessage.getSessionKey()); // aesEncryption.serializeKeyToString(actualMessage.getSessionKey());
+                                                                                               // // add session key
+                                                                                               // from
+                                                                                               // actual message
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 findUserByID(message.getSender()).setSecretKey(key); // Find user and add key
+                viewListOfUsers();
             }
 
             if (message.getType() == MessageType.SessionEnd) {
@@ -517,7 +538,7 @@ public class ChatClient extends javax.swing.JFrame {
 
                 appendTextAreaLive(actualMessage);
                 // Remove user from _listOfUsers
-                findUserByID(message.getSender()).removeSecretKey();
+                // findUserByID(message.getSender()).removeSecretKey();
 
             }
 
@@ -536,30 +557,32 @@ public class ChatClient extends javax.swing.JFrame {
             }
 
             if (message.getType() == MessageType.SendText) {
-                // cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody,
-                // findByID(message.getSender()));
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendTextMessage) messageBody.getMessage();
 
-                // if (!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest())) {
-                // return;
-                // }
+                if (!validateHashAgainstMessage(actualMessage,
+                        messageBody.getMessageDigest())) {
+                    return;
+                } else {
+                    System.out.println("Hashing Worked (text only)");
+                }
 
                 appendTextAreaLive(actualMessage);
             }
 
             if (message.getType() == MessageType.SendImageWithText) {
-                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody, findUserByID(message.getSender()));
+                cipherBody = EncryptionHelper.decryptWithSharedKey(cipherBody,
+                        findUserByID(message.getSender()));
                 var plainBody = cipherBody;
                 ProtocolBody messageBody = (ProtocolBody) HelperUtils.convertBase64StringToProtocolBody(plainBody);
                 var actualMessage = (SendImageWithTextMessage) messageBody.getMessage();
 
-                // if (!validateHashAgainstMessage(actualMessage,
-                // messageBody.getMessageDigest())) {
-                // return;
-                // }
+                if (!validateHashAgainstMessage(actualMessage,
+                        messageBody.getMessageDigest())) {
+                    return;
+                }
 
                 appendTextAreaLive(actualMessage);
                 setImageIconToLabel(byteArrayToImageIcon(actualMessage.getImageData()));
@@ -570,9 +593,11 @@ public class ChatClient extends javax.swing.JFrame {
     }
 
     private boolean validateHashAgainstMessage(IMessage message, String hashDigest) {
-        if (hashDigest == null || hashDigest.isBlank())
+        if (hashDigest == null || hashDigest.isBlank()) {
+            System.out.println("One of them is null");
             return true;
-
+        }
+        System.out.println("inValidateHash:" + message.getTimestamp() + " " + hashDigest);
         return (EncryptionHelper.createMessageDigest(message).equals(hashDigest));
     }
 
@@ -705,15 +730,29 @@ public class ChatClient extends javax.swing.JFrame {
         try {
             // Message if for the server
             if (messageType == MessageType.SessionStart) {
-                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);
+                /*
+                 * (1) findUserbyID(receiver.id)
+                 * (2) .setSessionKey(key)
+                 */
+                AESEncryption aesEncryption = new AESEncryption();
+                Key key = MessageFactory.createSharedKey();
+                try {
+                    findUserByID(receiver.getId()).setSecretKey(HelperUtils.convertKeytoBase64String(key));// aesEncryption.serializeKeyToString(key));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null, key);
+                System.out.println("Userlist after sending message");
+                viewListOfUsers();
             }
 
             if (messageType == MessageType.SessionEnd) {
-                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);
+                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null, null);
             }
 
             if (messageType == MessageType.ValidateCertRequest) {
-                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null);
+                message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, null, null);
             }
             if (messageType == MessageType.SendText || messageType == MessageType.SendImageWithText) {
                 String textData = textFieldInputMessage.getText();
@@ -724,7 +763,15 @@ public class ChatClient extends javax.swing.JFrame {
                 }
 
                 if (messageType == MessageType.SendText) {
-                    message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, textData);
+                    boolean cont = findUserByID(receiver.getId()).hasSharedKey();
+                    if (cont) {
+                        message = MessageFactory.CreateMessage(_currentUser, receiver, messageType, null, textData,
+                                null);
+
+                    } else {
+                        showErrorPopupMessage(errorTitle, "No connection established");
+                        return;
+                    }
                 }
 
                 if (messageType == MessageType.SendImageWithText) {
@@ -742,7 +789,7 @@ public class ChatClient extends javax.swing.JFrame {
                     }
 
                     message = MessageFactory.CreateMessage(_currentUser, receiver, messageType,
-                            Files.readAllBytes(imagePath), textData);
+                            Files.readAllBytes(imagePath), textData, null);
                 }
             }
         } catch (IOException ex) {
@@ -758,6 +805,8 @@ public class ChatClient extends javax.swing.JFrame {
             startListener();
 
         sendMessage(message);
+        //if (_inputStream == null || _inputStream )
+            startListener();
 
         textFieldInputMessage.setText("");
         textFieldInputMessage.setEnabled(true);
@@ -806,7 +855,7 @@ public class ChatClient extends javax.swing.JFrame {
             startListener();
             try {
                 MessageProtocol message = MessageFactory.CreateMessage(_currentUser, null, MessageType.SystemUserAuth,
-                        null, null);
+                        null, null, null);
                 sendMessage(message);
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -819,7 +868,19 @@ public class ChatClient extends javax.swing.JFrame {
         int reply = JOptionPane.showConfirmDialog(this, "Are you sure you would like to Exit the Application",
                 "Exit the Application", JOptionPane.YES_NO_OPTION);
         if (reply == JOptionPane.YES_OPTION) {
-            closeConnection();
+           try
+            {
+                closeConnection(); 
+            }
+            catch(Exception ex)
+            {
+                logException(ex);
+            }
+            finally
+            {
+               System.exit(0);
+            }
+                     
             System.exit(0);
         }
     }
@@ -953,18 +1014,19 @@ public class ChatClient extends javax.swing.JFrame {
                     Object object;
                     while ((object = _inputStream.readObject()) != null) {
                         MessageProtocol message = MessageFactory.getMessage(object);
+                        System.out.println("New incoming message");
                         processReceivedMessage(message);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ex) {
+                     logException(ex);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+                    logException(ex);
                 }
             });
             receiveThread.start();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+             logException(ex);
         }
     }
 
