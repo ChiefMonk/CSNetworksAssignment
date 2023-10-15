@@ -16,7 +16,7 @@ CSNetworksAssignment-1.0.1-jar-with-dependencies.jar or just CSNetworksAssignmen
 Running:
  In the IDE: 
  - To run the server, run the project in debug mode and select uct.cs.networks.ui.ChatServer. 
- - To run the client, run the ChatClient.java class from the IDE. Run atleast 2 clients
+ - To run the client, run the uct.cs.networks.ui.ChatClient.java class from the IDE. Run atleast 2 clients
 
 # Starting a Session
 - Server
